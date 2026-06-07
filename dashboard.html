@@ -4,51 +4,155 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Teste</title>
-    <link rel="stylesheet" href="style-inicio.css">
+    <link rel="stylesheet" href="src/css/style-dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
 </head>
-<body class="geral-dashboard">
-    <header>
-    </header>
+<body>
+    <main class="dashboard">
 
+        <!-- CARD 1 -->
+        <div class="dashboard-column" data-id="1">
+            <div class="dashboard-title">
+                <h2>
+                    A Fazer
+                </h2>
 
-<body class="geral-dashboard">
-
-    <div class="kanban-wrapper">
-        
-        <div class="kanban-divisao">
-            <div class="kanban-topo border-bottom-neon-todo">
-                <h2 class="fs-5 fw-bold text-white mb-0">📌 A Fazer</h2>
-                <span class="badge bg-primary rounded-pill">1</span>
+                <button class="add-card">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
             </div>
-            <div class="kanban-conteudo" id="raia-a-fazer">
-                <div class="kanban-card p-3">
-                    <h3 class="fs-6 fw-bold text-white mb-1">Montar estrutura do Dashboard</h3>
-                    <p class="small text-secondary mb-0">Deixar o layout dividido em 3 partes verticais iguais.</p>
+
+            <div class="dashboard-cards">
+                <div class="dashboard-card" draggable="true">
+                    <div class="badge high">
+                        <span>
+                            Alta prioridade
+                        </span>
+                    </div>
+
+                    <p class="title-card">
+                        Revisar documento do projeto
+                    </p>
+
+                    <div class="card-infos">
+                        <div class="card-icons">
+                            <p>
+                                <i class="fa-regular fa-comment">
+                                    1
+                                </i>
+                            </p>
+
+                            <p>
+                                <i class="fa-solid fa-paperclip">
+                                    1
+                                </i>
+                            </p>
+                        </div>
+
+                        <div class="user">
+                            <img src="imagens/porco.jpg" alt="porco">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="kanban-divisao">
-            <div class="kanban-topo border-bottom-neon-doing">
-                <h2 class="fs-5 fw-bold text-white mb-0">⚡ Em Andamento</h2>
-                <span class="badge bg-warning text-dark rounded-pill">0</span>
+        <!-- CARD 2 -->
+        <div class="dashboard-column" data-id="2">
+            <div class="dashboard-title">
+                <h2>
+                    Fazendo
+                </h2>
+
+                <button class="add-card">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
             </div>
-            <div class="kanban-conteudo" id="raia-em-andamento">
+
+            <div class="dashboard-cards">
+                <div class="dashboard-card" draggable="true">
+                    <div class="badge medium">
+                        <span>
+                            Alta prioridade
+                        </span>
+                    </div>
+
+                    <p class="title-card">
+                        Revisar documento do projeto
+                    </p>
+
+                    <div class="card-infos">
+                        <div class="card-icons">
+                            <p>
+                                <i class="fa-regular fa-comment">
+                                    1
+                                </i>
+                            </p>
+
+                            <p>
+                                <i class="fa-solid fa-paperclip">
+                                    1
+                                </i>
+                            </p>
+                        </div>
+
+                        <div class="user">
+                            <img src="imagens/porco.jpg" alt="porco">
+                        </div>
+                    </div>
                 </div>
+            </div>
         </div>
 
-        <div class="kanban-divisao">
-            <div class="kanban-topo border-bottom-neon-done">
-                <h2 class="fs-5 fw-bold text-white mb-0">✅ Concluído</h2>
-                <span class="badge bg-success rounded-pill">0</span>
+        <!-- CARD 3-->   
+        <div class="dashboard-column" data-id="3">
+            <div class="dashboard-title">
+                <h2>
+                    Concluído
+                </h2>
+
+                <button class="add-card">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
             </div>
-            <div class="kanban-conteudo" id="raia-concluido">
+
+            <div class="dashboard-cards">
+                <div class="dashboard-card" draggable="true">
+                    <div class="badge low">
+                        <span>
+                            Alta prioridade
+                        </span>
+                    </div>
+
+                    <p class="title-card">
+                        Revisar documento do projeto
+                    </p>
+
+                    <div class="card-infos">
+                        <div class="card-icons">
+                            <p>
+                                <i class="fa-regular fa-comment">
+                                    1
+                                </i>
+                            </p>
+
+                            <p>
+                                <i class="fa-solid fa-paperclip">
+                                    1
+                                </i>
+                            </p>
+                        </div>
+
+                        <div class="user">
+                            <img src="imagens/porco.jpg" alt="porco">
+                        </div>
+                    </div>
                 </div>
+            </div>
         </div>
+    </main>
 
-    </div>
-
-</body>
-       
+    <script src="src/javascript/script.js"></script>
 </body>
 </html>

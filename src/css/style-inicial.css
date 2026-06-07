@@ -1,0 +1,85 @@
+@charset "UTF-8";
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Fredoka:wght@300..700&display=swap');
+
+:root {
+    --cor1: #12192C;
+    --cor2: #3A435E;
+    --cor3: #767D91;
+    --cor4: #9BA6C4;
+    --cor5: #92ADF7;
+}
+
+
+.geral-inicio, .geral-dashboard {
+    padding: 1.5rem;
+    background: radial-gradient(1200px 800px at 80% -10%, #1e293b 0%, transparent 60%), 
+                    radial-gradient(900px 600px at -10% 110%, #172554 0%, transparent 55%), 
+                    linear-gradient(135deg, #0f172a 0%, #111827 50%, #0b1324 100%);
+        background-attachment: fixed;
+}
+
+
+/* INICIO */
+
+
+.geral-inicio header > h1 {
+    color: white;
+    text-align: center;
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: -0.02em;
+    font-size: 3.5em;
+    font-weight: 800;
+}
+
+.modal-header > h1 {
+    color: white;
+}
+
+header > p {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.1em;
+    margin: 0;
+    color: rgba(255, 255, 255, 0.493);
+    text-align: center;
+}
+
+.modal-content {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+
+.small-text {
+    color: var(--cor2);
+}
+
+.modal-body h2 {
+    color: var(--cor3);
+}
+
+.btn-primary {
+    background-color: #0b1942;
+}
+
+.btn-primary:hover {
+    background-color: #00081d !important;
+}
+
+.icone-box {
+    width: 48px;
+    height: 48px;
+    background-color: rgba(38, 110, 245, 0.1);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: 12px;
+    color: #38bdf8;
+    box-shadow: 0 0 15px rgba(38, 110, 245, 0.3), inset 0 0 10px rgba(38, 110, 245, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.icone-box svg {
+    filter: drop-shadow(0 0 4px #38bdf8);
+}
