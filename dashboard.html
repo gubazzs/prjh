@@ -3,58 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teste</title>
+    <title>Tasky Dashboard</title>
     <link rel="stylesheet" href="src/css/style-dashboard.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
 </head>
 <body>
     <main class="dashboard">
 
-        <!-- CARD 1 -->
-        <div class="dashboard-column" data-id="1">
+        <!-- COLUNA 1 - ROSA -->
+        <div class="dashboard-column" data-id="1" style="--column-color: #d573b6;">
             <div class="dashboard-title">
-                <h2>
-                    A Fazer
-                </h2>
-
-                <button class="add-card">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <button class="delete-column">
-                <i class="fa-solid fa-trash"></i>
-            </button>
+                <div class="title-left">
+                    <input type="color" class="color-picker" value="#d573b6" title="Mudar cor da coluna">
+                    <h2>A Fazer</h2>
+                </div>
+                <div class="column-actions">
+                    <button class="add-card"><i class="fa-solid fa-plus"></i></button>
+                    <button class="delete-column"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>
 
             <div class="dashboard-cards">
-                <div class="dashboard-card" draggable="true">
-                    <div class="badge high">
-                        <span>
-                            Alta prioridade
-                        </span>
+                <div class="dashboard-card" draggable="true" data-card-id="1">
+                    <div class="badge high" data-priority="high">
+                        <span>Alta prioridade</span>
+                        <i class="fa-solid fa-chevron-down"></i>
                     </div>
-
-                    <p class="title-card">
-                        Revisar documento do projeto
-                    </p>
-
+                    <p class="title-card">Revisar documento do projeto</p>
                     <div class="card-infos">
                         <div class="card-icons">
-                            <p>
-                                <i class="fa-regular fa-comment">
-                                    1
-                                </i>
-                            </p>
-
-                            <p>
-                                <i class="fa-solid fa-paperclip">
-                                    1
-                                </i>
-                            </p>
+                            <p><i class="fa-regular fa-comment"> 1</i></p>
+                            <p><i class="fa-solid fa-paperclip"> 1</i></p>
                         </div>
-
                         <div class="user">
-                            <img src="imagens/porco.jpg" alt="porco">
+                            <img src="imagens/porco.jpg" alt="user">
                             <i class="fa-solid fa-trash delete-card"></i>
                         </div>
                     </div>
@@ -62,50 +44,33 @@
             </div>
         </div>
 
-        <!-- CARD 2 -->
-        <div class="dashboard-column" data-id="2">
+        <!-- COLUNA 2 - AZUL -->
+        <div class="dashboard-column" data-id="2" style="--column-color: #58a6ff;">
             <div class="dashboard-title">
-                <h2>
-                    Fazendo
-                </h2>
-
-                <button class="add-card">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <button class="delete-column">
-                <i class="fa-solid fa-trash"></i>
-            </button>
+                <div class="title-left">
+                    <input type="color" class="color-picker" value="#58a6ff" title="Mudar cor da coluna">
+                    <h2>Fazendo</h2>
+                </div>
+                <div class="column-actions">
+                    <button class="add-card"><i class="fa-solid fa-plus"></i></button>
+                    <button class="delete-column"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>
 
             <div class="dashboard-cards">
-                <div class="dashboard-card" draggable="true">
-                    <div class="badge medium">
-                        <span>
-                            Média prioridade
-                        </span>
+                <div class="dashboard-card" draggable="true" data-card-id="2">
+                    <div class="badge medium" data-priority="medium">
+                        <span>Média prioridade</span>
+                        <i class="fa-solid fa-chevron-down"></i>
                     </div>
-
-                    <p class="title-card">
-                        Revisar documento do projeto
-                    </p>
-
+                    <p class="title-card">Revisar documento do projeto</p>
                     <div class="card-infos">
                         <div class="card-icons">
-                            <p>
-                                <i class="fa-regular fa-comment">
-                                    1
-                                </i>
-                            </p>
-
-                            <p>
-                                <i class="fa-solid fa-paperclip">
-                                    1
-                                </i>
-                            </p>
+                            <p><i class="fa-regular fa-comment"> 1</i></p>
+                            <p><i class="fa-solid fa-paperclip"> 1</i></p>
                         </div>
-
                         <div class="user">
-                            <img src="imagens/porco.jpg" alt="porco">
+                            <img src="imagens/porco.jpg" alt="user">
                             <i class="fa-solid fa-trash delete-card"></i>
                         </div>
                     </div>
@@ -113,50 +78,33 @@
             </div>
         </div>
 
-        <!-- CARD 3-->   
-        <div class="dashboard-column" data-id="3">
+        <!-- COLUNA 3 - VERDE -->   
+        <div class="dashboard-column" data-id="3" style="--column-color: #6ed0bc;">
             <div class="dashboard-title">
-                <h2>
-                    Concluído
-                </h2>
-
-                <button class="add-card">
-                    <i class="fa-solid fa-plus"></i>
-                </button>
-                <button class="delete-column">
-                <i class="fa-solid fa-trash"></i>
-            </button>
+                <div class="title-left">
+                    <input type="color" class="color-picker" value="#6ed0bc" title="Mudar cor da coluna">
+                    <h2>Concluído</h2>
+                </div>
+                <div class="column-actions">
+                    <button class="add-card"><i class="fa-solid fa-plus"></i></button>
+                    <button class="delete-column"><i class="fa-solid fa-trash"></i></button>
+                </div>
             </div>
 
             <div class="dashboard-cards">
-                <div class="dashboard-card" draggable="true">
-                    <div class="badge low">
-                        <span>
-                            Baixa prioridade
-                        </span>
+                <div class="dashboard-card" draggable="true" data-card-id="3">
+                    <div class="badge low" data-priority="low">
+                        <span>Baixa prioridade</span>
+                        <i class="fa-solid fa-chevron-down"></i>
                     </div>
-
-                    <p class="title-card">
-                        Revisar documento do projeto
-                    </p>
-
+                    <p class="title-card">Revisar documento do projeto</p>
                     <div class="card-infos">
                         <div class="card-icons">
-                            <p>
-                                <i class="fa-regular fa-comment">
-                                    1
-                                </i>
-                            </p>
-
-                            <p>
-                                <i class="fa-solid fa-paperclip">
-                                    1
-                                </i>
-                            </p>
+                            <p><i class="fa-regular fa-comment"> 1</i></p>
+                            <p><i class="fa-solid fa-paperclip"> 1</i></p>
                         </div>
-
                         <div class="user">
-                            <img src="imagens/porco.jpg" alt="porco">
+                            <img src="imagens/porco.jpg" alt="user">
                             <i class="fa-solid fa-trash delete-card"></i>
                         </div>
                     </div>
