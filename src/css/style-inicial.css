@@ -83,3 +83,17 @@ header > p {
 .icone-box svg {
     filter: drop-shadow(0 0 4px #38bdf8);
 }
+
+#toggleText {
+  color: #ffffff; 
+}
+
+#toggleText a {
+    padding: 5px;
+    color: #0d6efd; 
+}
+
+#toggleText a:hover {
+    background-color: #0c4ba891;
+    border-radius: 5px;
+}

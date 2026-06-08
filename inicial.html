@@ -8,78 +8,95 @@
     <link rel="stylesheet" href="src/css/style-inicial.css">
 </head>
 <body class="geral-inicio">
+
     <header>
         <h1>Tasky</h1>
         <p>Organize qualquer coisa com quadros, listas e cartões.</p>
     </header>
 
     <!-- Campo de Login -->
-    <main class="d-flex align-items-center py-4">
-        <div class="modal-dialog">
-        <div class="modal-content rounded-4 shadow">
-          <div class="modal-header p-5 pb-4 border-bottom-0">
-            <h1>Cadastre-se gratuitamente</h1>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
-          </div>
-          <div class="modal-body p-5 pt-0">
-            <form class="">
-              <div class="form-floating mb-3">
-                <input
-                  type="email"
-                  class="form-control rounded-3"
-                  id="floatingInput"
-                  placeholder="name@example.com"
-                />
-                <label for="floatingInput">Endereço de Email</label>
-              </div>
-              <div class="form-floating mb-3">
-                <input
-                  type="password"
-                  class="form-control rounded-3"
-                  id="floatingPassword"
-                  placeholder="Password"
-                />
-                <label for="floatingPassword">Senha</label>
-              </div>
-              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-primary"
-                type="submit"
-              >
-                Cadastrar-se
-              </button>
-              <small class="small-text">
-                Ao clicar em Cadastrar-se, você concorda com os termos de uso.
-                </small>
-              <hr class="my-4" />
-              <h2 class="fs-5 fw-bold mb-3">Ou use um de terceiros</h2>
-              <button
-                class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3"
-                type="submit"
-              >
-                <svg class="bi me-1" width="16" height="16" aria-hidden="true">
-                  <use xlink:href="#google"></use>
-                </svg>
-                Cadastrar-se com o Google
-              </button>
-              <button
-                class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3"
-                type="submit"
-              >
-                <svg class="bi me-1" width="16" height="16" aria-hidden="true">
-                  <use xlink:href="#github"></use>
-                </svg>
-                Cadastrar-se com o GitHub
-              </button>
-            </form>
-          </div>
-        </div>
+   <main class="d-flex align-items-center py-4">
+  <div class="modal-dialog">
+    <div class="modal-content rounded-4 shadow">
+      <div class="modal-header p-5 pb-4 border-bottom-0">
+        <h1 id="modalTitle">Entrar</h1>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
-    </main>
+      <div class="modal-body p-5 pt-0">
+        <form id="authForm">
+          <div class="form-floating mb-3">
+            <input
+              type="email"
+              class="form-control rounded-3"
+              id="floatingInput"
+              placeholder="name@example.com"
+              required
+            />
+            <label for="floatingInput">Endereço de Email</label>
+          </div>
+          <div class="form-floating mb-3">
+            <input
+              type="password"
+              class="form-control rounded-3"
+              id="floatingPassword"
+              placeholder="Password"
+              required
+            />
+            <label for="floatingPassword">Senha</label>
+          </div>
+          
+          <!-- BOTÃO PRINCIPAL - Texto muda entre Entrar/Cadastrar -->
+          <button id="btnSubmit" class="w-100 mb-2 btn btn-lg rounded-3 btn-primary"
+            type="submit"
+          >
+            Entrar
+          </button>
+          
+          <div id="termsText" class="text-center" style="display: none;">
+            <small class="small-text">
+              Ao clicar em Cadastrar, você concorda com os termos de uso.
+            </small>
+          </div>
 
+          <!-- LINK PRA ALTERNAR LOGIN/CADASTRO -->
+          <p class="text-center mt-3 mb-0" id="toggleText">
+            Não tem conta? <a href="#" id="toggleMode">Cadastre-se</a>
+          </p>
+
+          <hr class="my-4" />
+          <h2 class="fs-5 fw-bold mb-3">Ou use um de terceiros</h2>
+          
+          <button
+            id="btnGoogle"
+            class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3"
+            type="button"
+          >
+            <svg class="bi me-1" width="16" height="16" aria-hidden="true">
+              <use xlink:href="#google"></use>
+            </svg>
+            Entrar com Google
+          </button>
+          
+          <button
+            id="btnGithub"
+            class="w-100 py-2 mb-2 btn btn-outline-secondary rounded-3"
+            type="button"
+          >
+            <svg class="bi me-1" width="16" height="16" aria-hidden="true">
+              <use xlink:href="#github"></use>
+            </svg>
+            Entrar com GitHub
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
 
     <!-- Icones pequenos -->
     <section class="container text-center my-5 pt-4">
@@ -122,5 +139,116 @@
 </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { 
+        getAuth, 
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+        signInWithPopup,
+        GoogleAuthProvider,
+        GithubAuthProvider,
+        onAuthStateChanged
+      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDemKzBjgkq3e06d04DgMgV94a1YovtomQ",
+        authDomain: "tasky-39ea6.firebaseapp.com",
+        projectId: "tasky-39ea6",
+        storageBucket: "tasky-39ea6.firebasestorage.app",
+        messagingSenderId: "438206972793",
+        appId: "1:438206972793:web:8a6c2687ceeb0eba40e5a8"
+      };
+      
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const googleProvider = new GoogleAuthProvider();
+      const githubProvider = new GithubAuthProvider();
+
+      const emailInput = document.querySelector('#floatingInput');
+      const senhaInput = document.querySelector('#floatingPassword');
+      const btnSubmit = document.querySelector('#btnSubmit');
+      const btnGoogle = document.querySelector('#btnGoogle');
+      const btnGithub = document.querySelector('#btnGithub');
+      const modalTitle = document.querySelector('#modalTitle');
+      const toggleText = document.querySelector('#toggleText');
+      const termsText = document.querySelector('#termsText');
+      const authForm = document.querySelector('#authForm');
+
+      let isLoginMode = true; // true = Login, false = Cadastro
+
+      // Toggle entre Login e Cadastro
+      document.addEventListener('click', (e) => {
+        if (e.target.id === 'toggleMode') {
+          e.preventDefault();
+          isLoginMode = !isLoginMode;
+          
+          if (isLoginMode) {
+            modalTitle.textContent = 'Entrar';
+            btnSubmit.textContent = 'Entrar';
+            termsText.style.display = 'none';
+            toggleText.innerHTML = 'Não tem conta? <a href="#" id="toggleMode">Cadastre-se</a>';
+            btnGoogle.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#google"></use></svg> Entrar com Google`;
+            btnGithub.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#github"></use></svg> Entrar com GitHub`;
+          } else {
+            modalTitle.textContent = 'Cadastre-se gratuitamente';
+            btnSubmit.textContent = 'Cadastrar';
+            termsText.style.display = 'block';
+            toggleText.innerHTML = 'Já tem conta? <a href="#" id="toggleMode">Entrar</a>';
+            btnGoogle.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#google"></use></svg> Cadastrar-se com Google`;
+            btnGithub.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#github"></use></svg> Cadastrar-se com GitHub`;
+          }
+        }
+      });
+
+      // Submit do form - Login ou Cadastro
+      authForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = emailInput.value;
+        const senha = senhaInput.value;
+
+        if (senha.length < 6) {
+          alert('A senha precisa ter no mínimo 6 caracteres.');
+          return;
+        }
+
+        if (isLoginMode) {
+          // LOGIN
+          signInWithEmailAndPassword(auth, email, senha)
+            .then(() => window.location.href = 'dashboard.html')
+            .catch(() => alert('Email ou senha incorretos.'));
+        } else {
+          // CADASTRO
+          createUserWithEmailAndPassword(auth, email, senha)
+            .then(() => window.location.href = 'dashboard.html')
+            .catch((error) => {
+              if (error.code === 'auth/email-already-in-use') {
+                alert('Essa conta já existe. Faz login aí.');
+              } else {
+                alert(error.message);
+              }
+            });
+        }
+      });
+
+      // Google
+      btnGoogle?.addEventListener('click', () => {
+        signInWithPopup(auth, googleProvider)
+          .then(() => window.location.href = 'dashboard.html')
+          .catch(err => alert(err.message));
+      });
+
+      // GitHub
+      btnGithub?.addEventListener('click', () => {
+        signInWithPopup(auth, githubProvider)
+          .then(() => window.location.href = 'dashboard.html')
+          .catch(err => alert(err.message));
+      });
+
+      /* Se já logado, pula pra dashboard
+      onAuthStateChanged(auth, (user) => {
+        if (user) window.location.href = 'dashboard.html';
+      }); */
+    </script>
 </body>
 </html>
