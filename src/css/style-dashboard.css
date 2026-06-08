@@ -201,12 +201,12 @@ body {
     background: white;
     border-radius: 8px;
     box-shadow: 0px 5px 15px -3px rgba(0, 0, 0, 0.2);
-    padding: 6px;
+    padding: 4px;
     z-index: 10;
     display: none;
     flex-direction: column;
-    gap: 4px;
-    min-width: 140px;
+    gap: 2px;
+    min-width: 120px;
 }
 
 .priority-menu.active {
@@ -215,10 +215,13 @@ body {
 
 .priority-option {
     font-size: 12px;
-    padding: 6px 10px;
-    border-radius: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
     cursor: pointer;
     color: white;
+    font-weight: 500;
+    width: fit-content;
+    transition: all 0.2s;
 }
 
 .priority-option:hover {
@@ -258,5 +261,89 @@ body {
 
 .dragging {
     opacity: 0.3;
+}
+
+.column-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* BOTÃO DELETAR COLUNA */
+.delete-column {
+    color: #ef4444;
+    font-size: 16px;
+    background-color: transparent;
+    cursor: pointer;
+    border: none;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.dashboard-column:hover .delete-column {
+    opacity: 1;
+}
+
+.delete-column:hover {
+    transform: scale(1.1);
+}
+
+/* TÍTULO EDITÁVEL DA COLUNA */
+.dashboard-title h2 {
+    outline: none;
+    border-radius: 6px;
+    padding: 2px 6px;
+    margin: -2px -6px;
+    transition: all 0.2s;
+}
+
+.dashboard-title h2:hover {
+    background-color: #e5e7eb;
+}
+
+.dashboard-title h2:focus {
+    background-color: #e5e7eb;
+    box-shadow: 0 0 0 2px #92a5fb;
+}
+
+/* BOTÃO ADICIONAR COLUNA */
+.add-column {
+    min-width: 252px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px dashed rgba(255, 255, 255, 0.4);
+    border-radius: 12px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.add-column:hover {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.6);
+}
+
+.add-column i {
+    font-size: 20px;
+}
+
+/* MELHORA O SCROLL HORIZONTAL DO DASHBOARD */
+.dashboard {
+    align-items: flex-start;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+/* DIMINUI O AVATAR PRA CABER MELHOR */
+.user img {
+    width: 32px;
+    height: 32px;
 }
 
