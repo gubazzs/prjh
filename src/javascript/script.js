@@ -156,3 +156,12 @@ document.querySelectorAll('.dashboard-card').forEach(card => {
 });
 document.querySelectorAll('.badge').forEach(ativarPrioridade);
 document.querySelectorAll('.title-card').forEach(ativarTituloEditavel);
+
+/* DELETAR CARD - NOVO E ANTIGO */
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('delete-card')) {
+        e.stopPropagation();
+        const card = e.target.closest('.dashboard-card');
+        card.remove();
+    }
+});
