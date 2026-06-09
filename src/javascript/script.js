@@ -1,37 +1,78 @@
-/* FUNÇÃO: SALVAR BOARD COMPLETO NO LOCALSTORAGE */
+// ==========================================
+// 1. CONTROLE DE SESSÃO E LOGIN (SEMPRE NO TOPO)
+// ==========================================
+const usuarioLogado = JSON.parse(sessionStorage.getItem('usuario-tasky'));
+
+// Se não houver usuário logado no sessionStorage, chuta de volta para a tela de login
+if (!usuarioLogado) {
+    window.location.href = 'inicial.html'; 
+} else {
+    // Altera as imagens do card para usar a foto real do Firebase do usuário logado
+    // Se não tiver foto (cadastro por e-mail), mantém o porquinho padrão
+    const userPhoto = usuarioLogado.picture || 'imagens/porco.jpg';
+    
+    const avatarImg = document.getElementById('user-avatar');
+    const dropImg = document.getElementById('dropdown-avatar');
+    const userName = document.getElementById('user-name');
+    const userEmail = document.getElementById('user-email');
+
+    if (avatarImg) avatarImg.src = userPhoto;
+    if (dropImg) dropImg.src = userPhoto;
+    if (userName) userName.textContent = usuarioLogado.name;
+    if (userEmail) userEmail.textContent = usuarioLogado.email;
+}
+
+// ==========================================
+// 2. FUNÇÕES DE SALVAMENTO E CARREGAMENTO
+// ==========================================
+
+/* FUNÇÃO: SALVAR BOARD COMPLETO NO LOCALSTORAGE ESPECÍFICO POR USUÁRIO */
 function salvarBoard() {
+    if (!usuarioLogado) return;
+
     const colunas = [...document.querySelectorAll('.dashboard-column')].map(coluna => {
         const id = coluna.dataset.id;
         const cor = coluna.style.getPropertyValue('--column-color').trim() || '#8b5cf6';
         const titulo = coluna.querySelector('.dashboard-title h2').textContent;
         const cards = [...coluna.querySelectorAll('.dashboard-card')].map(card => {
             const badge = card.querySelector('.badge');
+            
+            // Tratamento preventivo caso os ícones de comentários/anexos mudem de classe
+            const commentIcon = card.querySelector('.fa-comment');
+            const attachIcon = card.querySelector('.fa-paperclip');
+
             return {
                 id: card.dataset.cardId || Date.now().toString(),
-                priority: badge.dataset.priority,
-                priorityText: badge.querySelector('span').textContent,
+                priority: badge ? badge.dataset.priority : 'low',
+                priorityText: badge ? badge.querySelector('span').textContent : 'Baixa prioridade',
                 title: card.querySelector('.title-card').textContent,
-                comments: card.querySelector('.fa-comment').parentElement.textContent.trim(),
-                attachments: card.querySelector('.fa-paperclip').parentElement.textContent.trim()
-            }
+                comments: commentIcon ? commentIcon.parentElement.textContent.trim() : '0',
+                attachments: attachIcon ? attachIcon.parentElement.parentElement.textContent.trim() : '0'
+            };
         });
         
         return { id, cor, titulo, cards };
     });
-    
-    localStorage.setItem('dashboard-data', JSON.stringify(colunas));
+
+    const chaveUsuario = `dashboard-data-${usuarioLogado.email}`;
+    localStorage.setItem(chaveUsuario, JSON.stringify(colunas));
 }
 
-/* FUNÇÃO: CARREGAR BOARD DO LOCALSTORAGE */
+/* FUNÇÃO: CARREGAR BOARD DO LOCALSTORAGE ESPECÍFICO */
 function carregarBoard() {
-    const dadosSalvos = localStorage.getItem('dashboard-data');
+    if (!usuarioLogado) return;
+
+    const chaveUsuario = `dashboard-data-${usuarioLogado.email}`;
+    const dadosSalvos = localStorage.getItem(chaveUsuario);
     const container = document.querySelector('.dashboard');
+    if (!container) return;
+    
     const addColumnBtn = container.querySelector('.add-column');
     
     if (!dadosSalvos) {
         document.querySelectorAll('.dashboard-column').forEach(coluna => {
             const cardsContainer = coluna.querySelector('.dashboard-cards');
-            ativarDropColuna(cardsContainer);
+            if (cardsContainer) ativarDropColuna(cardsContainer);
             ativarBotoesColuna(coluna);
             ativarSeletorCor(coluna);
             coluna.querySelectorAll('.dashboard-card').forEach(ativarDragCard);
@@ -50,6 +91,9 @@ function carregarBoard() {
         novaColuna.dataset.id = colunaData.id;
         novaColuna.style.setProperty('--column-color', colunaData.cor);
         
+        // Aplica a foto do usuário logado dinamicamente nos cartões antigos também!
+        const fotoUsuario = usuarioLogado.picture || 'imagens/porco.jpg';
+        
         novaColuna.innerHTML = `
             <div class="dashboard-title">
                 <div class="title-left">
@@ -64,7 +108,11 @@ function carregarBoard() {
             <div class="dashboard-cards"></div>
         `;
         
-        container.insertBefore(novaColuna, addColumnBtn);
+        if (addColumnBtn) {
+            container.insertBefore(novaColuna, addColumnBtn);
+        } else {
+            container.appendChild(novaColuna);
+        }
         
         const cardsContainer = novaColuna.querySelector('.dashboard-cards');
         ativarDropColuna(cardsContainer);
@@ -83,12 +131,8 @@ function carregarBoard() {
                 </div>
                 <p class="title-card">${cardData.title}</p>
                 <div class="card-infos">
-                    <div class="card-icons">
-                        <p><i class="fa-regular fa-comment"> ${cardData.comments}</i></p>
-                        <p><i class="fa-solid fa-paperclip"> ${cardData.attachments}</i></p>
-                    </div>
                     <div class="user">
-                        <img src="imagens/porco.jpg" alt="user">
+                        <img src="${fotoUsuario}" alt="user">
                         <i class="fa-solid fa-trash delete-card"></i>
                     </div>
                 </div>
@@ -102,7 +146,10 @@ function carregarBoard() {
     });
 }
 
-/* FUNÇÃO PRA CALCULAR ONDE SOLTAR O CARD */
+// ==========================================
+// 3. SISTEMA DE DRAG AND DROP
+// ==========================================
+
 function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.dashboard-card:not(.dragging)')];
     
@@ -118,7 +165,6 @@ function getDragAfterElement(container, y) {
     }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-/* ATIVAR DRAG NAS COLUNAS - COM ORDENAÇÃO ENTRE COLUNAS */
 function ativarDropColuna(column) {
     column.addEventListener('dragover', e => {
         e.preventDefault();
@@ -147,7 +193,6 @@ function ativarDropColuna(column) {
     });
 }
 
-/* FUNÇÃO: ATIVAR DRAG NO CARD */
 function ativarDragCard(card) {
     card.setAttribute('draggable', 'true');
     
@@ -168,15 +213,17 @@ function ativarDragCard(card) {
     });
 }
 
-/* FUNÇÃO: ATIVAR MENU DE PRIORIDADE */
+// ==========================================
+// 4. MENUS, EDIÇÕES E EVENTOS DOS CARDS
+// ==========================================
+
 function ativarPrioridade(badge) {
+    if (!badge) return;
     badge.addEventListener('click', (e) => {
         e.stopPropagation();
         
-        // Remove menus antigos
         document.querySelectorAll('.priority-menu').forEach(m => m.remove());
         
-        // Cria menu novo no BODY
         const menu = document.createElement('div');
         menu.classList.add('priority-menu', 'active');
         menu.innerHTML = `
@@ -186,7 +233,6 @@ function ativarPrioridade(badge) {
         `;
         document.body.appendChild(menu);
         
-        // Calcula posição
         const badgeRect = badge.getBoundingClientRect();
         const menuRect = menu.getBoundingClientRect();
         const spaceBelow = window.innerHeight - badgeRect.bottom;
@@ -200,7 +246,6 @@ function ativarPrioridade(badge) {
             menu.style.top = `${badgeRect.bottom + 6}px`;
         }
         
-        // Clique nas opções
         menu.querySelectorAll('.priority-option').forEach(option => {
             option.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -219,7 +264,7 @@ function ativarPrioridade(badge) {
     });
 }
 
-// Fecha menu ao clicar fora ou scrollar
+// Global para fechar os menus de prioridade abertos
 document.addEventListener('click', () => {
     document.querySelectorAll('.priority-menu').forEach(m => m.remove());
 });
@@ -228,8 +273,8 @@ document.addEventListener('scroll', () => {
     document.querySelectorAll('.priority-menu').forEach(m => m.remove());
 }, true);
 
-/* FUNÇÃO: ATIVAR TÍTULO EDITÁVEL */
 function ativarTituloEditavel(title) {
+    if (!title) return;
     title.setAttribute('contenteditable', 'true');
     title.setAttribute('spellcheck', 'false');
 
@@ -253,12 +298,13 @@ function ativarTituloEditavel(title) {
     });
 }
 
-/* FUNÇÃO: CRIAR CARD NOVO */
 function criarCard(cardsContainer) {
     const card = document.createElement('div');
     card.classList.add('dashboard-card');
     card.dataset.cardId = Date.now().toString();
     
+    const fotoUsuario = usuarioLogado ? (usuarioLogado.picture || 'imagens/porco.jpg') : 'imagens/porco.jpg';
+
     card.innerHTML = `
         <div class="badge low" data-priority="low">
             <span>Baixa prioridade</span>
@@ -271,7 +317,7 @@ function criarCard(cardsContainer) {
                 <p><i class="fa-solid fa-paperclip"> 0</i></p>
             </div>
             <div class="user">
-                <img src="imagens/porco.jpg" alt="user">
+                <img src="${fotoUsuario}" alt="user">
                 <i class="fa-solid fa-trash delete-card"></i>
             </div>
         </div>
@@ -290,7 +336,6 @@ function criarCard(cardsContainer) {
     salvarBoard();
 }
 
-/* FUNÇÃO: ATIVAR SELETOR DE COR DA COLUNA */
 function ativarSeletorCor(coluna) {
     const colorPicker = coluna.querySelector('.color-picker');
     if (!colorPicker) return;
@@ -302,11 +347,10 @@ function ativarSeletorCor(coluna) {
     });
 }
 
-/* FUNÇÃO: ATIVAR BOTÕES DA COLUNA */
 function ativarBotoesColuna(coluna) {
     const addCardBtn = coluna.querySelector('.add-card');
     if (addCardBtn) {
-        addCardBtn.addEventListener('click', (e) => {
+        addCardBtn.addEventListener('click', () => {
             const cardsContainer = coluna.querySelector('.dashboard-cards');
             criarCard(cardsContainer);
         });
@@ -345,7 +389,7 @@ function ativarBotoesColuna(coluna) {
     ativarSeletorCor(coluna);
 }
 
-/* ADICIONAR COLUNA NOVA */
+// Botão Global para adicionar colunas
 const addColumnBtn = document.querySelector('.add-column');
 if (addColumnBtn) {
     addColumnBtn.addEventListener('click', () => {
@@ -384,7 +428,7 @@ if (addColumnBtn) {
     });
 }
 
-/* EVENTOS GLOBAIS - SÓ UMA VEZ */
+// Cliques globais (excluir card)
 document.addEventListener('click', (e) => {
     document.querySelectorAll('.priority-menu.active').forEach(m => {
         m.classList.remove('active');
@@ -393,10 +437,38 @@ document.addEventListener('click', (e) => {
     if (e.target.classList.contains('delete-card')) {
         e.stopPropagation();
         const card = e.target.closest('.dashboard-card');
-        card.remove();
-        salvarBoard();
+        if (card) {
+            card.remove();
+            salvarBoard();
+        }
     }
 });
 
-/* INICIALIZAÇÃO - RODA QUANDO A PÁGINA CARREGA */
+// Dropdown de perfil (Avatar)
+const avatarBtn = document.getElementById('user-avatar');
+const userDropdown = document.getElementById('user-dropdown');
+
+if (avatarBtn && userDropdown) {
+    avatarBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('hidden');
+    });
+
+    document.addEventListener('click', () => {
+        userDropdown.classList.add('hidden');
+    });
+}
+
+// Evento de Logout
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        sessionStorage.removeItem('usuario-tasky');
+        window.location.href = 'inicial.html'; 
+    });
+}
+
+// ==========================================
+// 5. INICIALIZAÇÃO DA PÁGINA
+// ==========================================
 carregarBoard();

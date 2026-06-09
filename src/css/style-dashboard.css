@@ -26,12 +26,121 @@ body {
     color: var(--text-primary);
 }
 
+/* HEADER DO DASHBOARD */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-glass);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.dashboard-header .logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* MENU DE USUÁRIO */
+.user-menu {
+    position: relative;
+}
+
+.avatar-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid #334155;
+    transition: border-color 0.2s;
+    object-fit: cover;
+}
+
+.avatar-btn:hover {
+    border-color: var(--neon-blue);
+}
+
+.dropdown {
+    position: absolute;
+    right: 0;
+    top: 48px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px;
+    min-width: 220px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 1000;
+}
+
+.dropdown.hidden {
+    display: none;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.user-info img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--border-glass);
+}
+
+.user-info strong {
+    color: var(--text-primary);
+    display: block;
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.user-info small {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.dropdown hr {
+    border: none;
+    border-top: 1px solid #334155;
+    margin: 8px 0;
+}
+
+.dropdown button {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: #f87171;
+    padding: 8px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s;
+}
+
+.dropdown button:hover {
+    background: #334155;
+}
+
 .dashboard {
     display: flex;
     gap: 16px;
     padding: 24px;
     width: 100%;
-    height: 100vh;
+    height: calc(100vh - 61px); /* ALTURA MENOS HEADER */
     overflow-x: auto;
     align-items: flex-start;
 }
@@ -41,7 +150,7 @@ body {
     flex-direction: column;
     gap: 12px;
     height: fit-content;
-    max-height: calc(100vh - 48px);
+    max-height: calc(100vh - 109px); /* AJUSTE PRO HEADER */
     background: var(--bg-column);
     backdrop-filter: blur(10px);
     border-radius: 12px;
@@ -192,6 +301,18 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     padding-right: 4px;
+    padding-bottom: 4px;
+}
+
+.dashboard-cards:empty {
+    background: rgba(146, 173, 247, 0.05);
+    border: 2px dashed rgba(146, 173, 247, 0.2);
+    border-radius: 8px;
+}
+
+.dashboard-cards:empty.cards-hover {
+    background: rgba(146, 173, 247, 0.15);
+    border-color: rgba(146, 173, 247, 0.5);
 }
 
 .dashboard-cards::-webkit-scrollbar {
@@ -326,20 +447,20 @@ body {
 
 .priority-menu {
     position: fixed;
-    top: calc(100% + 4px);
-    left: 0;
-    background: #0a0f1e;
-    border: 1px solid var(--border-glass);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
-    padding: 6px;
-    z-index: 9999;
+    background: rgba(10, 15, 30, 0.98);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(146, 173, 247, 0.3);
+    border-radius: 10px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(146, 173, 247, 0.1);
+    padding: 4px;
+    z-index: 99999;
     display: none;
     flex-direction: column;
-    gap: 4px;
-    min-width: 140px;
-    max-height: 120px;
+    gap: 2px;
+    min-width: 170px;
+    max-height: 140px;
     overflow-y: auto;
+    animation: fadeIn 0.12s ease-out;
 }
 
 @keyframes fadeIn {
@@ -362,54 +483,69 @@ body {
 }
 
 .priority-menu::-webkit-scrollbar-track {
-    background: rgba(146, 173, 247, 0.1);
-    border-radius: 10px;
+    background: transparent;
 }
 
 .priority-menu::-webkit-scrollbar-thumb {
-    background: rgba(146, 173, 247, 0.3);
+    background: rgba(146, 173, 247, 0.25);
     border-radius: 10px;
 }
 
-.priority-menu::-webkit-scrollbar-thumb:hover {
-    background: rgba(146, 173, 247, 0.5);
-}
-
 .priority-option {
-    font-size: 12px;
-    padding: 6px 12px;
+    font-size: 13px;
+    padding: 8px 12px;
     border-radius: 6px;
     cursor: pointer;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     font-weight: 500;
-    transition: all 0.2s;
+    transition: all 0.15s;
     border: 1px solid transparent;
     background: transparent;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.priority-option::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
     flex-shrink: 0;
 }
 
+.priority-option[data-priority="high"]::before {
+    background: #d573b6;
+    box-shadow: 0 0 8px rgba(213, 115, 182, 0.7);
+}
+
+.priority-option[data-priority="medium"]::before {
+    background: #fea065;
+    box-shadow: 0 0 8px rgba(254, 160, 101, 0.7);
+}
+
+.priority-option[data-priority="low"]::before {
+    background: #58a6ff;
+    box-shadow: 0 0 8px rgba(88, 166, 255, 0.7);
+}
+
 .priority-option[data-priority="high"]:hover {
-    background: rgba(213, 115, 182, 0.2);
+    background: rgba(213, 115, 182, 0.12);
     color: #d573b6;
-    border-color: #d573b6;
-    box-shadow: 0 0 8px rgba(213, 115, 182, 0.4);
-    transform: translateX(2px);
+    border-color: rgba(213, 115, 182, 0.3);
 }
 
 .priority-option[data-priority="medium"]:hover {
-    background: rgba(254, 160, 101, 0.2);
+    background: rgba(254, 160, 101, 0.12);
     color: #fea065;
-    border-color: #fea065;
-    box-shadow: 0 0 8px rgba(254, 160, 101, 0.4);
-    transform: translateX(2px);
+    border-color: rgba(254, 160, 101, 0.3);
 }
 
 .priority-option[data-priority="low"]:hover {
-    background: rgba(88, 166, 255, 0.2);
+    background: rgba(88, 166, 255, 0.12);
     color: #58a6ff;
-    border-color: #58a6ff;
-    box-shadow: 0 0 8px rgba(88, 166, 255, 0.4);
-    transform: translateX(2px);
+    border-color: rgba(88, 166, 255, 0.3);
 }
 
 .card-infos {

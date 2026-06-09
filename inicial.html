@@ -20,12 +20,6 @@
     <div class="modal-content rounded-4 shadow">
       <div class="modal-header p-5 pb-4 border-bottom-0">
         <h1 id="modalTitle">Entrar</h1>
-        <button
-          type="button"
-          class="btn-close"
-          data-bs-dismiss="modal"
-          aria-label="Close"
-        ></button>
       </div>
       <div class="modal-body p-5 pt-0">
         <form id="authForm">
@@ -139,116 +133,116 @@
 </section>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import { 
-        getAuth, 
-        createUserWithEmailAndPassword,
-        signInWithEmailAndPassword,
-        signInWithPopup,
-        GoogleAuthProvider,
-        GithubAuthProvider,
-        onAuthStateChanged
-      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { 
+    getAuth, 
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
+    GithubAuthProvider
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyDemKzBjgkq3e06d04DgMgV94a1YovtomQ",
-        authDomain: "tasky-39ea6.firebaseapp.com",
-        projectId: "tasky-39ea6",
-        storageBucket: "tasky-39ea6.firebasestorage.app",
-        messagingSenderId: "438206972793",
-        appId: "1:438206972793:web:8a6c2687ceeb0eba40e5a8"
-      };
+  const firebaseConfig = {
+    apiKey: "AIzaSyDemKzBjgkq3e06d04DgMgV94a1YovtomQ",
+    authDomain: "tasky-39ea6.firebaseapp.com",
+    projectId: "tasky-39ea6",
+    storageBucket: "tasky-39ea6.firebasestorage.app",
+    messagingSenderId: "438206972793",
+    appId: "1:438206972793:web:8a6c2687ceeb0eba40e5a8"
+  };
+  
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const googleProvider = new GoogleAuthProvider();
+  const githubProvider = new GithubAuthProvider();
+
+  const emailInput = document.querySelector('#floatingInput');
+  const senhaInput = document.querySelector('#floatingPassword');
+  const btnSubmit = document.querySelector('#btnSubmit');
+  const btnGoogle = document.querySelector('#btnGoogle');
+  const btnGithub = document.querySelector('#btnGithub');
+  const modalTitle = document.querySelector('#modalTitle');
+  const toggleText = document.querySelector('#toggleText');
+  const termsText = document.querySelector('#termsText');
+  const authForm = document.querySelector('#authForm');
+
+  let isLoginMode = true;
+
+  // Função utilitária para salvar dados da sessão e redirecionar
+  function salvarSessaoERedirecionar(user) {
+    const dadosUsuario = {
+      name: user.displayName || user.email.split('@')[0], // Se não tiver nome (e-mail/senha), usa o início do e-mail
+      email: user.email,
+      picture: user.photoURL || 'imagens/porco.jpg' // Se não tiver foto, usa sua foto padrão do porquinho
+    };
+    sessionStorage.setItem('usuario-tasky', JSON.stringify(dadosUsuario));
+    window.location.href = 'dashboard.html';
+  }
+
+  // Toggle entre Login e Cadastro
+  document.addEventListener('click', (e) => {
+    if (e.target.id === 'toggleMode') {
+      e.preventDefault();
+      isLoginMode = !isLoginMode;
       
-      const app = initializeApp(firebaseConfig);
-      const auth = getAuth(app);
-      const googleProvider = new GoogleAuthProvider();
-      const githubProvider = new GithubAuthProvider();
+      if (isLoginMode) {
+        modalTitle.textContent = 'Entrar';
+        btnSubmit.textContent = 'Entrar';
+        termsText.style.display = 'none';
+        toggleText.innerHTML = 'Não tem conta? <a href="#" id="toggleMode">Cadastre-se</a>';
+      } else {
+        modalTitle.textContent = 'Cadastre-se gratuitamente';
+        btnSubmit.textContent = 'Cadastrar';
+        termsText.style.display = 'block';
+        toggleText.innerHTML = 'Já tem conta? <a href="#" id="toggleMode">Entrar</a>';
+      }
+    }
+  });
 
-      const emailInput = document.querySelector('#floatingInput');
-      const senhaInput = document.querySelector('#floatingPassword');
-      const btnSubmit = document.querySelector('#btnSubmit');
-      const btnGoogle = document.querySelector('#btnGoogle');
-      const btnGithub = document.querySelector('#btnGithub');
-      const modalTitle = document.querySelector('#modalTitle');
-      const toggleText = document.querySelector('#toggleText');
-      const termsText = document.querySelector('#termsText');
-      const authForm = document.querySelector('#authForm');
+  // Submit do form
+  authForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const email = emailInput.value;
+    const senha = senhaInput.value;
 
-      let isLoginMode = true; // true = Login, false = Cadastro
+    if (senha.length < 6) {
+      alert('A senha precisa ter no mínimo 6 caracteres.');
+      return;
+    }
 
-      // Toggle entre Login e Cadastro
-      document.addEventListener('click', (e) => {
-        if (e.target.id === 'toggleMode') {
-          e.preventDefault();
-          isLoginMode = !isLoginMode;
-          
-          if (isLoginMode) {
-            modalTitle.textContent = 'Entrar';
-            btnSubmit.textContent = 'Entrar';
-            termsText.style.display = 'none';
-            toggleText.innerHTML = 'Não tem conta? <a href="#" id="toggleMode">Cadastre-se</a>';
-            btnGoogle.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#google"></use></svg> Entrar com Google`;
-            btnGithub.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#github"></use></svg> Entrar com GitHub`;
+    if (isLoginMode) {
+      signInWithEmailAndPassword(auth, email, senha)
+        .then((userCredential) => salvarSessaoERedirecionar(userCredential.user))
+        .catch(() => alert('Email ou senha incorretos.'));
+    } else {
+      createUserWithEmailAndPassword(auth, email, senha)
+        .then((userCredential) => salvarSessaoERedirecionar(userCredential.user))
+        .catch((error) => {
+          if (error.code === 'auth/email-already-in-use') {
+            alert('Essa conta já existe. Faz login aí.');
           } else {
-            modalTitle.textContent = 'Cadastre-se gratuitamente';
-            btnSubmit.textContent = 'Cadastrar';
-            termsText.style.display = 'block';
-            toggleText.innerHTML = 'Já tem conta? <a href="#" id="toggleMode">Entrar</a>';
-            btnGoogle.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#google"></use></svg> Cadastrar-se com Google`;
-            btnGithub.innerHTML = `<svg class="bi me-1" width="16" height="16"><use xlink:href="#github"></use></svg> Cadastrar-se com GitHub`;
+            alert(error.message);
           }
-        }
-      });
+        });
+    }
+  });
 
-      // Submit do form - Login ou Cadastro
-      authForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const email = emailInput.value;
-        const senha = senhaInput.value;
+  // Google
+  btnGoogle?.addEventListener('click', () => {
+    signInWithPopup(auth, googleProvider)
+      .then((userCredential) => salvarSessaoERedirecionar(userCredential.user))
+      .catch(err => alert(err.message));
+  });
 
-        if (senha.length < 6) {
-          alert('A senha precisa ter no mínimo 6 caracteres.');
-          return;
-        }
-
-        if (isLoginMode) {
-          // LOGIN
-          signInWithEmailAndPassword(auth, email, senha)
-            .then(() => window.location.href = 'dashboard.html')
-            .catch(() => alert('Email ou senha incorretos.'));
-        } else {
-          // CADASTRO
-          createUserWithEmailAndPassword(auth, email, senha)
-            .then(() => window.location.href = 'dashboard.html')
-            .catch((error) => {
-              if (error.code === 'auth/email-already-in-use') {
-                alert('Essa conta já existe. Faz login aí.');
-              } else {
-                alert(error.message);
-              }
-            });
-        }
-      });
-
-      // Google
-      btnGoogle?.addEventListener('click', () => {
-        signInWithPopup(auth, googleProvider)
-          .then(() => window.location.href = 'dashboard.html')
-          .catch(err => alert(err.message));
-      });
-
-      // GitHub
-      btnGithub?.addEventListener('click', () => {
-        signInWithPopup(auth, githubProvider)
-          .then(() => window.location.href = 'dashboard.html')
-          .catch(err => alert(err.message));
-      });
-
-      /* Se já logado, pula pra dashboard
-      onAuthStateChanged(auth, (user) => {
-        if (user) window.location.href = 'dashboard.html';
-      }); */
-    </script>
+  // GitHub
+  btnGithub?.addEventListener('click', () => {
+    signInWithPopup(auth, githubProvider)
+      .then((userCredential) => salvarSessaoERedirecionar(userCredential.user))
+      .catch(err => alert(err.message));
+  });
+</script>
 </body>
 </html>

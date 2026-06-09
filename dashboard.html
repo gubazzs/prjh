@@ -6,10 +6,31 @@
     <title>Tasky Dashboard</title>
     <link rel="stylesheet" href="src/css/style-dashboard.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-    <main class="dashboard">
+    <!-- HEADER COM MENU DE USUÁRIO -->
+    <header class="dashboard-header">
+    <div class="logo">Tasky</div>
+    
+    <div class="user-menu">
+        <img id="user-avatar" src="imagens/porco.jpg" alt="Avatar" class="avatar-btn">
+        <div id="user-dropdown" class="dropdown hidden">
+            <div class="user-info">
+                <img id="dropdown-avatar" src="imagens/porco.jpg" alt="">
+                <div>
+                    <strong id="user-name">Usuário</strong>
+                    <small id="user-email">usuario@email.com</small>
+                </div>
+            </div> <hr>
+            <button id="logout-btn">
+                <i class="fa-solid fa-right-from-bracket"></i> Sair
+            </button>
+        </div>
+    </div>
+</header>
 
+    <main class="dashboard">
         <!-- COLUNA 1 - ROSA -->
         <div class="dashboard-column" data-id="1" style="--column-color: #d573b6;">
             <div class="dashboard-title">
@@ -22,26 +43,7 @@
                     <button class="delete-column"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
-
-            <div class="dashboard-cards">
-                <div class="dashboard-card" draggable="true" data-card-id="1">
-                    <div class="badge high" data-priority="high">
-                        <span>Alta prioridade</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <p class="title-card">Revisar documento do projeto</p>
-                    <div class="card-infos">
-                        <div class="card-icons">
-                            <p><i class="fa-regular fa-comment"> 1</i></p>
-                            <p><i class="fa-solid fa-paperclip"> 1</i></p>
-                        </div>
-                        <div class="user">
-                            <img src="imagens/porco.jpg" alt="user">
-                            <i class="fa-solid fa-trash delete-card"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="dashboard-cards"></div>
         </div>
 
         <!-- COLUNA 2 - AZUL -->
@@ -56,26 +58,7 @@
                     <button class="delete-column"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
-
-            <div class="dashboard-cards">
-                <div class="dashboard-card" draggable="true" data-card-id="2">
-                    <div class="badge medium" data-priority="medium">
-                        <span>Média prioridade</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <p class="title-card">Revisar documento do projeto</p>
-                    <div class="card-infos">
-                        <div class="card-icons">
-                            <p><i class="fa-regular fa-comment"> 1</i></p>
-                            <p><i class="fa-solid fa-paperclip"> 1</i></p>
-                        </div>
-                        <div class="user">
-                            <img src="imagens/porco.jpg" alt="user">
-                            <i class="fa-solid fa-trash delete-card"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="dashboard-cards"></div>
         </div>
 
         <!-- COLUNA 3 - VERDE -->   
@@ -90,33 +73,13 @@
                     <button class="delete-column"><i class="fa-solid fa-trash"></i></button>
                 </div>
             </div>
-
-            <div class="dashboard-cards">
-                <div class="dashboard-card" draggable="true" data-card-id="3">
-                    <div class="badge low" data-priority="low">
-                        <span>Baixa prioridade</span>
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </div>
-                    <p class="title-card">Revisar documento do projeto</p>
-                    <div class="card-infos">
-                        <div class="card-icons">
-                            <p><i class="fa-regular fa-comment"> 1</i></p>
-                            <p><i class="fa-solid fa-paperclip"> 1</i></p>
-                        </div>
-                        <div class="user">
-                            <img src="imagens/porco.jpg" alt="user">
-                            <i class="fa-solid fa-trash delete-card"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <div class="dashboard-cards"></div>
         </div>
 
         <button class="add-column">
             <i class="fa-solid fa-plus"></i>
             <span>Adicionar coluna</span>
         </button>
-
     </main>
 
     <script src="src/javascript/script.js"></script>
