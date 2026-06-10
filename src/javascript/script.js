@@ -62,12 +62,16 @@ function carregarBoard() {
     
     const addColumnBtn = container.querySelector('.add-column');
     
+    // SE NÃO HOUVER DADOS SALVOS (Primeira vez que o usuário entra)
     if (!dadosSalvos) {
         document.querySelectorAll('.dashboard-column').forEach(coluna => {
             const cardsContainer = coluna.querySelector('.dashboard-cards');
+            
+            // Ativa o drag and drop e os botões da coluna padrão do HTML
             if (cardsContainer) ativarDropColuna(cardsContainer);
-            ativarBotoesColuna(coluna);
-            ativarSeletorCor(coluna);
+            ativarBotoesColuna(coluna); // Ativa os botões e a cor de forma limpa
+            
+            // Ativa os comportamentos dos cards que já vierem fixos no HTML
             coluna.querySelectorAll('.dashboard-card').forEach(ativarDragCard);
             coluna.querySelectorAll('.badge').forEach(ativarPrioridade);
             coluna.querySelectorAll('.title-card').forEach(ativarTituloEditavel);
@@ -75,6 +79,7 @@ function carregarBoard() {
         return;
     }
     
+    // SE HOUVER DADOS SALVOS (Reconstrói o board do zero)
     const colunas = JSON.parse(dadosSalvos);
     container.querySelectorAll('.dashboard-column').forEach(c => c.remove());
     
@@ -84,7 +89,6 @@ function carregarBoard() {
         novaColuna.dataset.id = colunaData.id;
         novaColuna.style.setProperty('--column-color', colunaData.cor);
         
-        // faz com que a foto de perfil vá para cards antigos também
         const fotoUsuario = usuarioLogado.picture || 'imagens/porco.jpg';
         
         novaColuna.innerHTML = `
@@ -109,7 +113,7 @@ function carregarBoard() {
         
         const cardsContainer = novaColuna.querySelector('.dashboard-cards');
         ativarDropColuna(cardsContainer);
-        ativarBotoesColuna(novaColuna);
+        ativarBotoesColuna(novaColuna); // Ativa botões e cor sem duplicar nada!
         
         colunaData.cards.forEach(cardData => {
             const card = document.createElement('div');
