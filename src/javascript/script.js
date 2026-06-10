@@ -142,8 +142,10 @@ function carregarBoard() {
     });
 }
 
+// ==========================================
 // 3. SISTEMA DE DRAG AND DROP
-    function getDragAfterElement(container, y) {
+// ==========================================
+function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.dashboard-card:not(.dragging)')];
     
     return draggableElements.reduce((closest, child) => {
@@ -206,7 +208,9 @@ function ativarDragCard(card) {
     });
 }
 
+// ==========================================
 // 4. MENUS, EDIÇÕES E EVENTOS DOS CARDS
+// ==========================================
 function ativarPrioridade(badge) {
     if (!badge) return;
     badge.addEventListener('click', (e) => {
@@ -253,10 +257,6 @@ function ativarPrioridade(badge) {
         });
     });
 }
-
-document.addEventListener('scroll', () => {
-    document.querySelectorAll('.priority-menu').forEach(m => m.remove());
-}, true);
 
 function ativarTituloEditavel(title) {
     if (!title) return;
@@ -409,11 +409,17 @@ if (addColumnBtn) {
     });
 }
 
- //menus, edições e eventos de cards
+// ==========================================
+// CENTRAL DE CLIQUES GLOBAIS (UNIFICADA)
+// ==========================================
+const avatarBtn = document.getElementById('user-avatar');
+const userDropdown = document.getElementById('user-dropdown');
+
 document.addEventListener('click', (e) => {
+    // 1. Fecha menus de prioridade abertos ao clicar em qualquer lugar
     document.querySelectorAll('.priority-menu').forEach(m => m.remove());
     
-
+    // 2. Lógica para deletar o card se clicar na lixeira
     if (e.target.classList.contains('delete-card')) {
         e.stopPropagation();
         const card = e.target.closest('.dashboard-card');
@@ -421,28 +427,24 @@ document.addEventListener('click', (e) => {
             card.remove();
             salvarBoard(); 
         }
+        return;
+    }
+
+    // 3. Lógica unificada do Dropdown de Avatar
+    if (avatarBtn && userDropdown) {
+        if (avatarBtn.contains(e.target)) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('hidden'); // Abre/Fecha se clicar no botão do avatar
+        } else {
+            userDropdown.classList.add('hidden'); // Fecha se clicar fora de tudo
+        }
     }
 });
 
-// Mantem o do scroll do jeito que estava:
+// Fecha o menu de prioridades no Scroll da página
 document.addEventListener('scroll', () => {
     document.querySelectorAll('.priority-menu').forEach(m => m.remove());
 }, true);
-
-// Dropdown de perfil (Avatar)
-const avatarBtn = document.getElementById('user-avatar');
-const userDropdown = document.getElementById('user-dropdown');
-
-if (avatarBtn && userDropdown) {
-    avatarBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        userDropdown.classList.toggle('hidden');
-    });
-
-    document.addEventListener('click', () => {
-        userDropdown.classList.add('hidden');
-    });
-}
 
 // Evento de Logout
 const logoutBtn = document.getElementById('logout-btn');
@@ -453,7 +455,7 @@ if (logoutBtn) {
     });
 }
 
-
-//Iinicialição da pagina
-
+// ==========================================
+// 5. INICIALIZAÇÃO DA PÁGINA
+// ==========================================
 carregarBoard();
