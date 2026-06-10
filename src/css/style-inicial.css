@@ -74,9 +74,6 @@ header > p {
     border-radius: 12px;
     color: #38bdf8;
     box-shadow: 0 0 15px rgba(38, 110, 245, 0.3), inset 0 0 10px rgba(38, 110, 245, 0.2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
     transition: all 0.3s ease;
 }
 
