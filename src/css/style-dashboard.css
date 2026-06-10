@@ -232,10 +232,6 @@ body {
     border-color: rgba(255,255,255,0.7);
 }
 
-.color-picker::-webkit-color-swatch-wrapper {
-    padding: 0;
-}
-
 .color-picker::-webkit-color-swatch {
     border-radius: 50%;
     border: none;
@@ -488,8 +484,8 @@ body {
 }
 
 .priority-option[data-priority="high"]::before {
-    background: #d573b6;
-    box-shadow: 0 0 8px rgba(213, 115, 182, 0.7);
+    background: var(--neon-pink);
+    box-shadow: 0 0 8px var(--neon-pink);
 }
 
 .priority-option[data-priority="medium"]::before {
