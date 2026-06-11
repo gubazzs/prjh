@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasky · Projetos</title>
+    <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="src/css/style-projetos.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+<body>
+    <!-- header com menu de usuário -->
+    <header class="dashboard-header">
+        <div class="logo">Tasky</div>
+
+        <div class="user-menu">
+            <img id="user-avatar" src="imagens/porco.jpg" alt="Avatar" class="avatar-btn">
+            <div id="user-dropdown" class="dropdown hidden">
+                <div class="user-info">
+                    <img id="dropdown-avatar" src="imagens/porco.jpg" alt="">
+                    <div>
+                        <strong id="user-name">Usuário</strong>
+                        <small id="user-email">usuario@email.com</small>
+                    </div>
+                </div> <hr>
+                <button id="logout-btn">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="projetos-main">
+        <div class="projetos-head">
+            <div>
+                <h1>Seus projetos</h1>
+                <p>Cada projeto tem seu próprio quadro Kanban.</p>
+            </div>
+            <button id="novo-projeto-btn" class="btn-novo">
+                <i class="fa-solid fa-plus"></i> Novo projeto
+            </button>
+        </div>
+
+        <div id="projetos-grid" class="projetos-grid"></div>
+
+        <div id="empty-state" class="empty-state hidden">
+            <i class="fa-solid fa-folder-open"></i>
+            <h2>Nenhum projeto ainda</h2>
+            <p>Crie seu primeiro projeto pra começar a organizar suas tarefas.</p>
+            <button id="empty-novo-btn" class="btn-novo">
+                <i class="fa-solid fa-plus"></i> Criar projeto
+            </button>
+        </div>
+    </main>
+
+    <!-- modal de criar / editar projeto -->
+    <div id="projeto-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h2 id="modal-title">Novo projeto</h2>
+                <button id="modal-close" class="modal-close" title="Fechar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="projeto-form">
+                <input type="hidden" id="projeto-id">
+
+                <label class="campo">
+                    <span>Nome</span>
+                    <input type="text" id="projeto-nome" placeholder="Ex: API de pagamentos" maxlength="60" required>
+                </label>
+
+                <label class="campo">
+                    <span>Descrição <small>(opcional)</small></span>
+                    <textarea id="projeto-desc" placeholder="Do que se trata esse projeto?" maxlength="180" rows="3"></textarea>
+                </label>
+
+                <div class="campo">
+                    <span>Cor</span>
+                    <div id="cor-opcoes" class="cor-opcoes"></div>
+                </div>
+
+                <div class="modal-acoes">
+                    <button type="button" id="modal-cancelar" class="btn-secundario">Cancelar</button>
+                    <button type="submit" class="btn-primario">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="src/javascript/projetos.js"></script>
+</body>
+</html>

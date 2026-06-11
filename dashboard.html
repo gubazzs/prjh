@@ -12,8 +12,25 @@
 <body>
     <!-- header com menu de usuário -->
     <header class="dashboard-header">
-    <div class="logo">Tasky</div>
-    
+    <div class="header-left">
+        <a href="projetos.html" class="back-btn" title="Voltar aos projetos"><i class="fa-solid fa-arrow-left"></i></a>
+        <div class="logo">Tasky</div>
+        <span class="project-name" id="project-name"></span>
+    </div>
+
+    <div class="board-toolbar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="search-input" placeholder="Buscar tarefa...">
+        </div>
+        <select id="priority-filter" title="Filtrar por prioridade">
+            <option value="all">Todas</option>
+            <option value="high">Alta</option>
+            <option value="medium">Média</option>
+            <option value="low">Baixa</option>
+        </select>
+    </div>
+
     <div class="user-menu">
         <img id="user-avatar" src="imagens/porco.jpg" alt="Avatar" class="avatar-btn">
         <div id="user-dropdown" class="dropdown hidden">
@@ -24,6 +41,14 @@
                     <small id="user-email">usuario@email.com</small>
                 </div>
             </div> <hr>
+            <button id="export-btn">
+                <i class="fa-solid fa-file-export"></i> Exportar board
+            </button>
+            <button id="import-btn">
+                <i class="fa-solid fa-file-import"></i> Importar board
+            </button>
+            <input type="file" id="import-input" accept="application/json" hidden>
+            <hr>
             <button id="logout-btn">
                 <i class="fa-solid fa-right-from-bracket"></i> Sair
             </button>
@@ -38,6 +63,7 @@
                 <div class="title-left">
                     <input type="color" class="color-picker" value="#d573b6" title="Mudar cor da coluna">
                     <h2>A Fazer</h2>
+                    <span class="card-count">0</span>
                 </div>
                 <div class="column-actions">
                     <button class="add-card"><i class="fa-solid fa-plus"></i></button>
@@ -53,6 +79,7 @@
                 <div class="title-left">
                     <input type="color" class="color-picker" value="#58a6ff" title="Mudar cor da coluna">
                     <h2>Fazendo</h2>
+                    <span class="card-count">0</span>
                 </div>
                 <div class="column-actions">
                     <button class="add-card"><i class="fa-solid fa-plus"></i></button>
@@ -68,6 +95,7 @@
                 <div class="title-left">
                     <input type="color" class="color-picker" value="#6ed0bc" title="Mudar cor da coluna">
                     <h2>Concluído</h2>
+                    <span class="card-count">0</span>
                 </div>
                 <div class="column-actions">
                     <button class="add-card"><i class="fa-solid fa-plus"></i></button>
@@ -82,6 +110,37 @@
             <span>Adicionar coluna</span>
         </button>
     </main>
+
+    <!-- modal de detalhes do card -->
+    <div id="card-modal" class="card-modal-overlay hidden">
+        <div class="card-modal-box">
+            <div class="card-modal-header">
+                <div class="badge low card-modal-badge" data-priority="low">
+                    <span>Baixa prioridade</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </div>
+                <button class="card-modal-close" id="card-modal-close" title="Fechar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="card-modal-body">
+                <p class="card-modal-title" contenteditable="true" spellcheck="false"></p>
+                <div class="card-modal-field">
+                    <span><i class="fa-solid fa-align-left"></i> Descrição</span>
+                    <textarea id="card-modal-desc" class="card-modal-desc" placeholder="Adicione uma descrição, links, notas..."></textarea>
+                </div>
+                <div class="card-modal-field">
+                    <span><i class="fa-regular fa-calendar"></i> Prazo</span>
+                    <input type="date" id="card-modal-date" class="card-modal-date">
+                </div>
+            </div>
+            <div class="card-modal-footer">
+                <button class="card-modal-delete" id="card-modal-delete">
+                    <i class="fa-solid fa-trash"></i> Excluir tarefa
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="src/javascript/script.js"></script>
 </body>

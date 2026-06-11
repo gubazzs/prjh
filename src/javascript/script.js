@@ -1,10 +1,35 @@
 //CONTROLE DE SESSÃO E LOGIN (SEMPRE NO TOPO)
 const usuarioLogado = JSON.parse(sessionStorage.getItem('usuario-tasky'));
 
+//PROJETO ATUAL (vem da URL: dashboard.html?project=ID)
+const projetoId = new URLSearchParams(location.search).get('project');
+
 //se não houver usuário logado no sessionStorage, chuta de volta para a tela de login
 if (!usuarioLogado) {
-    window.location.href = 'inicial.html'; 
+    window.location.href = 'inicial.html';
+} else if (!projetoId) {
+    //sem projeto selecionado, volta para a lista de projetos
+    window.location.href = 'projetos.html';
 } else {
+    //carrega os dados do projeto (nome + cor) para o header
+    let projetoAtual = null;
+    try {
+        const todos = JSON.parse(localStorage.getItem(`tasky-projects-${usuarioLogado.email}`)) || [];
+        projetoAtual = todos.find(p => p.id === projetoId) || null;
+    } catch { projetoAtual = null; }
+
+    //se o projeto não existe mais, volta para a lista
+    if (!projetoAtual) {
+        window.location.href = 'projetos.html';
+    }
+
+    const projectNameEl = document.getElementById('project-name');
+    if (projectNameEl && projetoAtual) {
+        projectNameEl.textContent = projetoAtual.name;
+        projectNameEl.style.setProperty('--proj-color', projetoAtual.color || '#58a6ff');
+        document.title = `Tasky · ${projetoAtual.name}`;
+    }
+
     //Altera as imagens do card para usar a foto real do Firebase do usuário logado
     
     //Se não tiver foto (cadastro por e-mail), mantém o porquinho padrão
@@ -34,26 +59,30 @@ function salvarBoard() {
         const titulo = coluna.querySelector('.dashboard-title h2').textContent;
         const cards = [...coluna.querySelectorAll('.dashboard-card')].map(card => {
             const badge = card.querySelector('.badge');
+            const dueInput = card.querySelector('.due-input');
             return {
                 id: card.dataset.cardId || Date.now().toString(),
                 priority: badge ? badge.dataset.priority : 'low',
                 priorityText: badge ? badge.querySelector('span').textContent : 'Baixa prioridade',
                 title: card.querySelector('.title-card').textContent,
+                dueDate: dueInput ? dueInput.value : '',
+                description: card.dataset.description || '',
             };
         });
-        
+
         return { id, cor, titulo, cards };
     });
 
-    const chaveUsuario = `dashboard-data-${usuarioLogado.email}`;
+    const chaveUsuario = `dashboard-data-${usuarioLogado.email}-${projetoId}`;
     localStorage.setItem(chaveUsuario, JSON.stringify(colunas));
+    atualizarContadores();
 }
 
 //FUNÇÃO: CARREGAR BOARD DO LOCALSTORAGE ESPECÍFICO
 function carregarBoard() {
     if (!usuarioLogado) return;
 
-    const chaveUsuario = `dashboard-data-${usuarioLogado.email}`;
+    const chaveUsuario = `dashboard-data-${usuarioLogado.email}-${projetoId}`;
     const dadosSalvos = localStorage.getItem(chaveUsuario);
     const container = document.querySelector('.dashboard');
     if (!container) return;
@@ -70,10 +99,9 @@ function carregarBoard() {
             ativarBotoesColuna(coluna); // Ativa os botões e a cor de forma limpa
             
             //ativa os comportamentos dos cards que já vierem fixos no HTML
-            coluna.querySelectorAll('.dashboard-card').forEach(ativarDragCard);
-            coluna.querySelectorAll('.badge').forEach(ativarPrioridade);
-            coluna.querySelectorAll('.title-card').forEach(ativarTituloEditavel);
+            coluna.querySelectorAll('.dashboard-card').forEach(ativarCard);
         });
+        atualizarContadores();
         return;
     }
     
@@ -94,6 +122,7 @@ function carregarBoard() {
                 <div class="title-left">
                     <input type="color" class="color-picker" value="${colunaData.cor}" title="Mudar cor da coluna">
                     <h2>${colunaData.titulo}</h2>
+                    <span class="card-count">0</span>
                 </div>
                 <div class="column-actions">
                     <button class="add-card"><i class="fa-solid fa-plus"></i></button>
@@ -117,25 +146,30 @@ function carregarBoard() {
             const card = document.createElement('div');
             card.classList.add('dashboard-card');
             card.dataset.cardId = cardData.id;
-            
+            card.dataset.description = cardData.description || '';
+
             card.innerHTML = `
                 <div class="badge ${cardData.priority}" data-priority="${cardData.priority}">
                     <span>${cardData.priorityText}</span>
                     <i class="fa-solid fa-chevron-down"></i>
                 </div>
                 <p class="title-card">${cardData.title}</p>
+                <i class="fa-solid fa-expand open-card-detail" title="Ver detalhes"></i>
                 <div class="card-infos">
+                    <label class="card-due" data-empty="${cardData.dueDate ? 'false' : 'true'}">
+                        <i class="fa-regular fa-calendar"></i>
+                        <input type="date" class="due-input" value="${cardData.dueDate || ''}">
+                        <span class="due-clear" title="Limpar prazo"><i class="fa-solid fa-xmark"></i></span>
+                    </label>
                     <div class="user">
                         <img src="${fotoUsuario}" alt="user">
                         <i class="fa-solid fa-trash delete-card"></i>
                     </div>
                 </div>
             `;
-            
+
             cardsContainer.appendChild(card);
-            ativarDragCard(card);
-            ativarPrioridade(card.querySelector('.badge'));
-            ativarTituloEditavel(card.querySelector('.title-card'));
+            ativarCard(card);
         });
     });
 }
@@ -143,12 +177,12 @@ function carregarBoard() {
 
 //sistema de drag and drop
 function getDragAfterElement(container, y) {
-    const draggableElements = [...container.querySelectorAll('.dashboard-card:not(.dragging)')];
-    
+    const draggableElements = [...container.querySelectorAll('.dashboard-card:not(.dragging):not(.filtered-out)')];
+
     return draggableElements.reduce((closest, child) => {
         const box = child.getBoundingClientRect();
         const offset = y - box.top - box.height / 2;
-        
+
         if (offset < 0 && offset > closest.offset) {
             return { offset: offset, element: child };
         } else {
@@ -189,9 +223,11 @@ function ativarDragCard(card) {
     card.setAttribute('draggable', 'true');
     
     card.addEventListener('dragstart', e => {
-        if (e.target.classList.contains('title-card') || 
-            e.target.closest('.badge') || 
-            e.target.classList.contains('delete-card')) {
+        if (e.target.classList.contains('title-card') ||
+            e.target.closest('.badge') ||
+            e.target.closest('.card-due') ||
+            e.target.classList.contains('delete-card') ||
+            e.target.classList.contains('open-card-detail')) {
             e.preventDefault();
             return;
         }
@@ -207,13 +243,13 @@ function ativarDragCard(card) {
 
 
 //menus, edições e eventos de card
-function ativarPrioridade(badge) {
+function ativarPrioridade(badge, noSave = false) {
     if (!badge) return;
     badge.addEventListener('click', (e) => {
         e.stopPropagation();
-        
+
         document.querySelectorAll('.priority-menu').forEach(m => m.remove());
-        
+
         const menu = document.createElement('div');
         menu.classList.add('priority-menu', 'active');
         menu.innerHTML = `
@@ -222,33 +258,33 @@ function ativarPrioridade(badge) {
             <div class="priority-option" data-priority="low">Baixa prioridade</div>
         `;
         document.body.appendChild(menu);
-        
+
         const badgeRect = badge.getBoundingClientRect();
         const menuRect = menu.getBoundingClientRect();
         const spaceBelow = window.innerHeight - badgeRect.bottom;
-        
+
         menu.style.left = `${badgeRect.left}px`;
         menu.style.width = `${Math.max(badgeRect.width, 170)}px`;
-        
+
         if (spaceBelow < menuRect.height + 10 && badgeRect.top > menuRect.height + 10) {
             menu.style.top = `${badgeRect.top - menuRect.height - 6}px`;
         } else {
             menu.style.top = `${badgeRect.bottom + 6}px`;
         }
-        
+
         menu.querySelectorAll('.priority-option').forEach(option => {
             option.addEventListener('click', (e) => {
                 e.stopPropagation();
                 const newPriority = option.dataset.priority;
                 const newText = option.textContent;
-                
+
                 badge.classList.remove('high', 'medium', 'low');
                 badge.classList.add(newPriority);
                 badge.dataset.priority = newPriority;
                 badge.querySelector('span').textContent = newText;
-                
+
                 menu.remove();
-                salvarBoard();
+                if (!noSave) salvarBoard();
             });
         });
     });
@@ -286,31 +322,37 @@ function criarCard(cardsContainer) {
     
     const fotoUsuario = usuarioLogado.picture || 'imagens/porco.jpg';
 
+    card.dataset.description = '';
     card.innerHTML = `
         <div class="badge low" data-priority="low">
             <span>Baixa prioridade</span>
             <i class="fa-solid fa-chevron-down"></i>
         </div>
         <p class="title-card">Nova tarefa</p>
+        <i class="fa-solid fa-expand open-card-detail" title="Ver detalhes"></i>
         <div class="card-infos">
+            <label class="card-due" data-empty="true">
+                <i class="fa-regular fa-calendar"></i>
+                <input type="date" class="due-input" value="">
+                <span class="due-clear" title="Limpar prazo"><i class="fa-solid fa-xmark"></i></span>
+            </label>
             <div class="user">
                 <img src="${fotoUsuario}" alt="user">
                 <i class="fa-solid fa-trash delete-card"></i>
             </div>
         </div>
     `;
-    
+
     cardsContainer.appendChild(card);
-    
-    ativarDragCard(card);
-    ativarPrioridade(card.querySelector('.badge'));
-    ativarTituloEditavel(card.querySelector('.title-card'));
-    
+
+    ativarCard(card);
+
     const title = card.querySelector('.title-card');
     title.focus();
     document.getSelection().selectAllChildren(title);
-    
+
     salvarBoard();
+    aplicarFiltro();
 }
 
 function ativarSeletorCor(coluna) {
@@ -382,6 +424,7 @@ if (addColumnBtn) {
                 <div class="title-left">
                     <input type="color" class="color-picker" value="#8b5cf6" title="Mudar cor da coluna">
                     <h2>Nova coluna</h2>
+                    <span class="card-count">0</span>
                 </div>
                 <div class="column-actions">
                     <button class="add-card"><i class="fa-solid fa-plus"></i></button>
@@ -413,7 +456,15 @@ const userDropdown = document.getElementById('user-dropdown');
 document.addEventListener('click', (e) => {
     //fecha menus de prioridade abertos ao clicar em qualquer lugar
     document.querySelectorAll('.priority-menu').forEach(m => m.remove());
-    
+
+    //abre modal de detalhes do card
+    if (e.target.classList.contains('open-card-detail')) {
+        e.stopPropagation();
+        const card = e.target.closest('.dashboard-card');
+        if (card) abrirModalCard(card);
+        return;
+    }
+
     //lógica para deletar o card se clicar na lixeira
     if (e.target.classList.contains('delete-card')) {
         e.stopPropagation();
@@ -451,5 +502,222 @@ if (logoutBtn) {
 }
 
 
+//ATIVA TODOS OS COMPORTAMENTOS DE UM CARD (drag, prioridade, título, prazo)
+function ativarCard(card) {
+    ativarDragCard(card);
+    ativarPrioridade(card.querySelector('.badge'));
+    ativarTituloEditavel(card.querySelector('.title-card'));
+    ativarPrazo(card);
+}
+
+//PRAZO (DUE DATE)
+function atualizarPrazoCard(card) {
+    const wrap = card.querySelector('.card-due');
+    const input = card.querySelector('.due-input');
+    if (!wrap || !input) return;
+
+    wrap.classList.remove('due-overdue', 'due-soon', 'due-ok');
+
+    if (!input.value) {
+        wrap.dataset.empty = 'true';
+        return;
+    }
+    wrap.dataset.empty = 'false';
+
+    const hoje = new Date();
+    hoje.setHours(0, 0, 0, 0);
+    const prazo = new Date(input.value + 'T00:00:00');
+    const dias = Math.round((prazo - hoje) / 86400000);
+
+    if (dias < 0) wrap.classList.add('due-overdue');
+    else if (dias <= 2) wrap.classList.add('due-soon');
+    else wrap.classList.add('due-ok');
+}
+
+function ativarPrazo(card) {
+    const input = card.querySelector('.due-input');
+    const clear = card.querySelector('.due-clear');
+
+    if (input) {
+        input.addEventListener('mousedown', e => e.stopPropagation());
+        input.addEventListener('change', () => {
+            atualizarPrazoCard(card);
+            salvarBoard();
+        });
+    }
+    if (clear) {
+        clear.addEventListener('click', e => {
+            e.stopPropagation();
+            e.preventDefault();
+            if (input) input.value = '';
+            atualizarPrazoCard(card);
+            salvarBoard();
+        });
+    }
+    atualizarPrazoCard(card);
+}
+
+//CONTADOR DE CARDS POR COLUNA
+function atualizarContadores() {
+    document.querySelectorAll('.dashboard-column').forEach(coluna => {
+        const span = coluna.querySelector('.card-count');
+        if (span) span.textContent = coluna.querySelectorAll('.dashboard-card:not(.filtered-out)').length;
+    });
+}
+
+//BUSCA / FILTRO
+const searchInput = document.getElementById('search-input');
+const priorityFilter = document.getElementById('priority-filter');
+
+function aplicarFiltro() {
+    const termo = (searchInput?.value || '').toLowerCase().trim();
+    const prio = priorityFilter?.value || 'all';
+
+    document.querySelectorAll('.dashboard-card').forEach(card => {
+        const titulo = card.querySelector('.title-card')?.textContent.toLowerCase() || '';
+        const desc = (card.dataset.description || '').toLowerCase();
+        const cardPrio = card.querySelector('.badge')?.dataset.priority || 'low';
+        const matchTexto = !termo || titulo.includes(termo) || desc.includes(termo);
+        const matchPrio = prio === 'all' || cardPrio === prio;
+        const visivel = matchTexto && matchPrio;
+
+        card.classList.toggle('filtered-out', !visivel);
+        card.setAttribute('draggable', visivel ? 'true' : 'false');
+    });
+
+    atualizarContadores();
+}
+
+if (searchInput) searchInput.addEventListener('input', aplicarFiltro);
+if (priorityFilter) priorityFilter.addEventListener('change', aplicarFiltro);
+
+//EXPORTAR / IMPORTAR BOARD EM JSON
+function exportarBoard() {
+    if (!usuarioLogado) return;
+    salvarBoard();
+    const chave = `dashboard-data-${usuarioLogado.email}-${projetoId}`;
+    const dados = localStorage.getItem(chave) || '[]';
+    const blob = new Blob([dados], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `tasky-board-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+function importarBoard(file) {
+    if (!file || !usuarioLogado) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+        try {
+            const dados = JSON.parse(e.target.result);
+            if (!Array.isArray(dados)) throw new Error('formato inesperado');
+            const chave = `dashboard-data-${usuarioLogado.email}-${projetoId}`;
+            localStorage.setItem(chave, JSON.stringify(dados));
+            location.reload();
+        } catch (err) {
+            alert('Não consegui importar esse arquivo: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+}
+
+const exportBtn = document.getElementById('export-btn');
+const importBtn = document.getElementById('import-btn');
+const importInput = document.getElementById('import-input');
+
+if (exportBtn) exportBtn.addEventListener('click', exportarBoard);
+if (importBtn && importInput) {
+    importBtn.addEventListener('click', () => importInput.click());
+    importInput.addEventListener('change', e => {
+        if (e.target.files[0]) importarBoard(e.target.files[0]);
+    });
+}
+
+// ============================================
+// MODAL DE DETALHES DO CARD
+// ============================================
+const cardModal = document.getElementById('card-modal');
+const cardModalBadgeEl = cardModal ? cardModal.querySelector('.card-modal-badge') : null;
+const cardModalTitleEl = cardModal ? cardModal.querySelector('.card-modal-title') : null;
+const cardModalDescEl = document.getElementById('card-modal-desc');
+const cardModalDateEl = document.getElementById('card-modal-date');
+let cardModalAtivo = null;
+
+if (cardModalBadgeEl) ativarPrioridade(cardModalBadgeEl, true);
+
+function abrirModalCard(card) {
+    if (!cardModal) return;
+    cardModalAtivo = card;
+
+    const badge = card.querySelector('.badge');
+    const dueInput = card.querySelector('.due-input');
+
+    cardModalBadgeEl.classList.remove('high', 'medium', 'low');
+    cardModalBadgeEl.classList.add(badge.dataset.priority);
+    cardModalBadgeEl.dataset.priority = badge.dataset.priority;
+    cardModalBadgeEl.querySelector('span').textContent = badge.querySelector('span').textContent;
+
+    cardModalTitleEl.textContent = card.querySelector('.title-card').textContent;
+    cardModalDescEl.value = card.dataset.description || '';
+    cardModalDateEl.value = dueInput ? dueInput.value : '';
+
+    cardModal.classList.remove('hidden');
+    setTimeout(() => cardModalTitleEl.focus(), 50);
+}
+
+function fecharModalCard() {
+    if (!cardModal || !cardModalAtivo) return;
+
+    const badge = cardModalAtivo.querySelector('.badge');
+    const dueInput = cardModalAtivo.querySelector('.due-input');
+
+    badge.classList.remove('high', 'medium', 'low');
+    badge.classList.add(cardModalBadgeEl.dataset.priority);
+    badge.dataset.priority = cardModalBadgeEl.dataset.priority;
+    badge.querySelector('span').textContent = cardModalBadgeEl.querySelector('span').textContent;
+
+    const novoTitulo = cardModalTitleEl.textContent.trim();
+    cardModalAtivo.querySelector('.title-card').textContent = novoTitulo || 'Nova tarefa';
+
+    cardModalAtivo.dataset.description = cardModalDescEl.value.trim();
+
+    if (dueInput) {
+        dueInput.value = cardModalDateEl.value;
+        atualizarPrazoCard(cardModalAtivo);
+    }
+
+    salvarBoard();
+    cardModal.classList.add('hidden');
+    cardModalAtivo = null;
+}
+
+document.getElementById('card-modal-close')?.addEventListener('click', fecharModalCard);
+
+cardModal?.addEventListener('click', e => {
+    if (e.target === cardModal) fecharModalCard();
+});
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && cardModal && !cardModal.classList.contains('hidden')) {
+        fecharModalCard();
+    }
+});
+
+document.getElementById('card-modal-delete')?.addEventListener('click', () => {
+    if (!cardModalAtivo) return;
+    cardModalAtivo.remove();
+    salvarBoard();
+    cardModal.classList.add('hidden');
+    cardModalAtivo = null;
+});
+
+//impede que o título do modal quebre linha com Enter
+cardModalTitleEl?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); cardModalTitleEl.blur(); }
+});
+
 //inicialização da página
 carregarBoard();
+aplicarFiltro();
