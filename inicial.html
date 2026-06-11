@@ -45,10 +45,9 @@
             <label for="floatingPassword">Senha</label>
           </div>
           
-          <!-- BOTÃO PRINCIPAL - Texto muda entre Entrar/Cadastrar -->
+          <!-- botão que muda entre entrar e cadastrar-se -->
           <button id="btnSubmit" class="w-100 mb-2 btn btn-lg rounded-3 btn-primary"
-            type="submit"
-          >
+            type="submit">
             Entrar
           </button>
           
@@ -58,7 +57,7 @@
             </small>
           </div>
 
-          <!-- LINK PRA ALTERNAR LOGIN/CADASTRO -->
+          <!-- link para alterar login/cadastro -->
           <p class="text-center mt-3 mb-0" id="toggleText">
             Não tem conta? <a href="#" id="toggleMode">Cadastre-se</a>
           </p>
@@ -175,9 +174,9 @@
   // Função utilitária para salvar dados da sessão e redirecionar
   function salvarSessaoERedirecionar(user) {
     const dadosUsuario = {
-      name: user.displayName || user.email.split('@')[0], // Se não tiver nome (e-mail/senha), usa o início do e-mail
+      name: user.displayName || user.email.split('@')[0], //se não tiver nome (email/senha) usa o início do e-mail
       email: user.email,
-      picture: user.photoURL || 'imagens/porco.jpg' // Se não tiver foto, usa sua foto padrão do porquinho
+      picture: user.photoURL || 'imagens/porco.jpg' //se não tiver foto, usa sua foto padrão do porco CORINTHIANS
     };
     sessionStorage.setItem('usuario-tasky', JSON.stringify(dadosUsuario));
     window.location.href = 'dashboard.html';

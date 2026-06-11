@@ -1,14 +1,13 @@
-// ==========================================
-// 1. CONTROLE DE SESSÃO E LOGIN (SEMPRE NO TOPO)
-// ==========================================
+//CONTROLE DE SESSÃO E LOGIN (SEMPRE NO TOPO)
 const usuarioLogado = JSON.parse(sessionStorage.getItem('usuario-tasky'));
 
-// Se não houver usuário logado no sessionStorage, chuta de volta para a tela de login
+//se não houver usuário logado no sessionStorage, chuta de volta para a tela de login
 if (!usuarioLogado) {
     window.location.href = 'inicial.html'; 
 } else {
-    // Altera as imagens do card para usar a foto real do Firebase do usuário logado
-    // Se não tiver foto (cadastro por e-mail), mantém o porquinho padrão
+    //Altera as imagens do card para usar a foto real do Firebase do usuário logado
+    
+    //Se não tiver foto (cadastro por e-mail), mantém o porquinho padrão
     const userPhoto = usuarioLogado.picture || 'imagens/porco.jpg';
     
     const avatarImg = document.getElementById('user-avatar');
@@ -22,11 +21,10 @@ if (!usuarioLogado) {
     if (userEmail) userEmail.textContent = usuarioLogado.email;
 }
 
-// ==========================================
-// 2. FUNÇÕES DE SALVAMENTO E CARREGAMENTO
-// ==========================================
+//FUNÇÕES DE SALVAMENTO E CARREGAMENTO
 
-/* FUNÇÃO: SALVAR BOARD COMPLETO NO LOCALSTORAGE ESPECÍFICO POR USUÁRIO */
+
+//FUNÇÃO: SALVAR BOARD COMPLETO NO LOCALSTORAGE ESPECÍFICO POR USUÁRIO
 function salvarBoard() {
     if (!usuarioLogado) return;
 
@@ -51,7 +49,7 @@ function salvarBoard() {
     localStorage.setItem(chaveUsuario, JSON.stringify(colunas));
 }
 
-/* FUNÇÃO: CARREGAR BOARD DO LOCALSTORAGE ESPECÍFICO */
+//FUNÇÃO: CARREGAR BOARD DO LOCALSTORAGE ESPECÍFICO
 function carregarBoard() {
     if (!usuarioLogado) return;
 
@@ -62,16 +60,16 @@ function carregarBoard() {
     
     const addColumnBtn = container.querySelector('.add-column');
     
-    // SE NÃO HOUVER DADOS SALVOS (Primeira vez que o usuário entra)
+    //SE NÃO HOUVER DADOS SALVOS (Primeira vez que o usuário entra)
     if (!dadosSalvos) {
         document.querySelectorAll('.dashboard-column').forEach(coluna => {
             const cardsContainer = coluna.querySelector('.dashboard-cards');
             
-            // Ativa o drag and drop e os botões da coluna padrão do HTML
+            //Ativa o drag and drop e os botões da coluna padrão do HTML
             if (cardsContainer) ativarDropColuna(cardsContainer);
             ativarBotoesColuna(coluna); // Ativa os botões e a cor de forma limpa
             
-            // Ativa os comportamentos dos cards que já vierem fixos no HTML
+            //ativa os comportamentos dos cards que já vierem fixos no HTML
             coluna.querySelectorAll('.dashboard-card').forEach(ativarDragCard);
             coluna.querySelectorAll('.badge').forEach(ativarPrioridade);
             coluna.querySelectorAll('.title-card').forEach(ativarTituloEditavel);
@@ -79,7 +77,7 @@ function carregarBoard() {
         return;
     }
     
-    // SE HOUVER DADOS SALVOS (Reconstrói o board do zero)
+    //SE HOUVER DADOS SALVOS (Reconstrói o board do zero)
     const colunas = JSON.parse(dadosSalvos);
     container.querySelectorAll('.dashboard-column').forEach(c => c.remove());
     
@@ -113,7 +111,7 @@ function carregarBoard() {
         
         const cardsContainer = novaColuna.querySelector('.dashboard-cards');
         ativarDropColuna(cardsContainer);
-        ativarBotoesColuna(novaColuna); // Ativa botões e cor sem duplicar nada!
+        ativarBotoesColuna(novaColuna); //ativa botões e cor sem duplicar nada
         
         colunaData.cards.forEach(cardData => {
             const card = document.createElement('div');
@@ -142,9 +140,8 @@ function carregarBoard() {
     });
 }
 
-// ==========================================
-// 3. SISTEMA DE DRAG AND DROP
-// ==========================================
+
+//sistema de drag and drop
 function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.dashboard-card:not(.dragging)')];
     
@@ -208,9 +205,8 @@ function ativarDragCard(card) {
     });
 }
 
-// ==========================================
-// 4. MENUS, EDIÇÕES E EVENTOS DOS CARDS
-// ==========================================
+
+//menus, edições e eventos de card
 function ativarPrioridade(badge) {
     if (!badge) return;
     badge.addEventListener('click', (e) => {
@@ -370,7 +366,7 @@ function ativarBotoesColuna(coluna) {
     ativarSeletorCor(coluna);
 }
 
-// Botão Global para adicionar colunas
+//botão Global para adicionar colunas
 const addColumnBtn = document.querySelector('.add-column');
 if (addColumnBtn) {
     addColumnBtn.addEventListener('click', () => {
@@ -409,17 +405,16 @@ if (addColumnBtn) {
     });
 }
 
-// ==========================================
-// CENTRAL DE CLIQUES GLOBAIS (UNIFICADA)
-// ==========================================
+
+//central de cliques
 const avatarBtn = document.getElementById('user-avatar');
 const userDropdown = document.getElementById('user-dropdown');
 
 document.addEventListener('click', (e) => {
-    // 1. Fecha menus de prioridade abertos ao clicar em qualquer lugar
+    //fecha menus de prioridade abertos ao clicar em qualquer lugar
     document.querySelectorAll('.priority-menu').forEach(m => m.remove());
     
-    // 2. Lógica para deletar o card se clicar na lixeira
+    //lógica para deletar o card se clicar na lixeira
     if (e.target.classList.contains('delete-card')) {
         e.stopPropagation();
         const card = e.target.closest('.dashboard-card');
@@ -430,18 +425,18 @@ document.addEventListener('click', (e) => {
         return;
     }
 
-    // 3. Lógica unificada do Dropdown de Avatar
+    //lógica unificada do Dropdown de Avatar
     if (avatarBtn && userDropdown) {
         if (avatarBtn.contains(e.target)) {
             e.stopPropagation();
-            userDropdown.classList.toggle('hidden'); // Abre/Fecha se clicar no botão do avatar
+            userDropdown.classList.toggle('hidden'); //abre/fecha se clicar no botão do avatar
         } else {
-            userDropdown.classList.add('hidden'); // Fecha se clicar fora de tudo
+            userDropdown.classList.add('hidden'); //fecha se clicar fora de tudo
         }
     }
 });
 
-// Fecha o menu de prioridades no Scroll da página
+//fecha o menu de prioridades no Scroll da página
 document.addEventListener('scroll', () => {
     document.querySelectorAll('.priority-menu').forEach(m => m.remove());
 }, true);
@@ -455,7 +450,6 @@ if (logoutBtn) {
     });
 }
 
-// ==========================================
-// 5. INICIALIZAÇÃO DA PÁGINA
-// ==========================================
+
+//inicialização da página
 carregarBoard();
