@@ -315,11 +315,11 @@ function ativarTituloEditavel(title) {
     });
 }
 
-function criarCard(cardsContainer) {
+function criarCard(cardsContainer, tituloInicial = 'Nova tarefa') {
     const card = document.createElement('div');
     card.classList.add('dashboard-card');
     card.dataset.cardId = Date.now().toString();
-    
+
     const fotoUsuario = usuarioLogado.picture || 'imagens/porco.jpg';
 
     card.dataset.description = '';
@@ -328,7 +328,7 @@ function criarCard(cardsContainer) {
             <span>Baixa prioridade</span>
             <i class="fa-solid fa-chevron-down"></i>
         </div>
-        <p class="title-card">Nova tarefa</p>
+        <p class="title-card">${tituloInicial}</p>
         <i class="fa-solid fa-expand open-card-detail" title="Ver detalhes"></i>
         <div class="card-infos">
             <label class="card-due" data-empty="true">
@@ -347,9 +347,11 @@ function criarCard(cardsContainer) {
 
     ativarCard(card);
 
-    const title = card.querySelector('.title-card');
-    title.focus();
-    document.getSelection().selectAllChildren(title);
+    if (tituloInicial === 'Nova tarefa') {
+        const title = card.querySelector('.title-card');
+        title.focus();
+        document.getSelection().selectAllChildren(title);
+    }
 
     salvarBoard();
     aplicarFiltro();
@@ -636,6 +638,165 @@ if (importBtn && importInput) {
 }
 
 // ============================================
+// LINK DE ANALYTICS
+// ============================================
+const analyticsLink = document.getElementById('analytics-link');
+if (analyticsLink && projetoId) {
+    analyticsLink.href = `analytics.html?project=${projetoId}`;
+}
+
+// ============================================
+// MODAL: GITHUB ISSUES IMPORT
+// ============================================
+const githubModal = document.getElementById('github-modal');
+const githubBtn = document.getElementById('github-btn');
+const githubFetchBtn = document.getElementById('github-fetch-btn');
+const githubIssuesList = document.getElementById('github-issues-list');
+const githubFooter = document.getElementById('github-footer');
+const githubSelectedCount = document.getElementById('github-selected-count');
+
+const MOCK_ISSUES = [
+    { number: 42, title: 'Adicionar autenticação via OAuth', labels: ['feature'] },
+    { number: 38, title: 'Corrigir bug no cálculo de prazo dos cards', labels: ['bug'] },
+    { number: 35, title: 'Melhorar performance do drag & drop', labels: ['enhancement'] },
+    { number: 29, title: 'Escrever testes unitários para o board', labels: ['feature'] },
+    { number: 21, title: 'Documentar endpoints da API', labels: ['docs'] },
+    { number: 17, title: 'Adicionar dark/light mode toggle', labels: ['enhancement'] },
+];
+
+function abrirGithubModal() {
+    githubModal.classList.remove('hidden');
+    githubIssuesList.classList.add('hidden');
+    githubIssuesList.innerHTML = '';
+    githubFooter.classList.add('hidden');
+    document.getElementById('github-repo-url').value = '';
+}
+
+function fecharGithubModal() { githubModal.classList.add('hidden'); }
+
+function atualizarGithubCount() {
+    const checked = githubIssuesList.querySelectorAll('input[type="checkbox"]:checked').length;
+    githubSelectedCount.textContent = `${checked} selecionada${checked !== 1 ? 's' : ''}`;
+    githubFooter.classList.toggle('hidden', checked === 0);
+}
+
+githubBtn?.addEventListener('click', abrirGithubModal);
+document.getElementById('github-modal-close')?.addEventListener('click', fecharGithubModal);
+githubModal?.addEventListener('click', e => { if (e.target === githubModal) fecharGithubModal(); });
+
+githubFetchBtn?.addEventListener('click', () => {
+    const url = document.getElementById('github-repo-url').value.trim();
+    if (!url) return;
+
+    githubFetchBtn.textContent = 'Buscando...';
+    githubFetchBtn.disabled = true;
+
+    setTimeout(() => {
+        githubFetchBtn.textContent = 'Buscar';
+        githubFetchBtn.disabled = false;
+        githubIssuesList.innerHTML = '';
+        githubIssuesList.classList.remove('hidden');
+
+        MOCK_ISSUES.forEach(issue => {
+            const el = document.createElement('div');
+            el.className = 'github-issue-item';
+            el.innerHTML = `
+                <input type="checkbox" data-issue="${issue.number}">
+                <div class="issue-info">
+                    <div class="issue-title">${issue.title}</div>
+                    <div class="issue-meta">
+                        <span>#${issue.number}</span>
+                        ${issue.labels.map(l => `<span class="issue-label ${l}">${l}</span>`).join('')}
+                    </div>
+                </div>
+            `;
+            const checkbox = el.querySelector('input');
+            el.addEventListener('click', e => {
+                if (e.target !== checkbox) checkbox.checked = !checkbox.checked;
+                el.classList.toggle('selected', checkbox.checked);
+                atualizarGithubCount();
+            });
+            githubIssuesList.appendChild(el);
+        });
+        atualizarGithubCount();
+    }, 800);
+});
+
+document.getElementById('github-add-btn')?.addEventListener('click', () => {
+    const checked = [...githubIssuesList.querySelectorAll('input[type="checkbox"]:checked')];
+    if (checked.length === 0) return;
+
+    const primeiraColunaCards = document.querySelector('.dashboard-column .dashboard-cards');
+    if (!primeiraColunaCards) return;
+
+    checked.forEach(cb => {
+        const issueNum = cb.dataset.issue;
+        const issueEl = MOCK_ISSUES.find(i => i.number == issueNum);
+        if (issueEl) criarCard(primeiraColunaCards, issueEl.title);
+    });
+
+    fecharGithubModal();
+});
+
+// ============================================
+// MODAL: STANDUP GENERATOR
+// ============================================
+const standupModal = document.getElementById('standup-modal');
+const standupBtn = document.getElementById('standup-btn');
+
+function gerarTextoStandup() {
+    const colunas = [...document.querySelectorAll('.dashboard-column')];
+    const data = new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    const nomeProjeto = document.getElementById('project-name')?.textContent || 'Projeto';
+
+    let texto = `📋 Standup — ${data}\n`;
+    texto += `Projeto: ${nomeProjeto}\n`;
+    texto += '─'.repeat(36) + '\n\n';
+
+    let totalCards = 0;
+    colunas.forEach(col => {
+        const titulo = col.querySelector('.dashboard-title h2')?.textContent || 'Coluna';
+        const cards = [...col.querySelectorAll('.dashboard-card:not(.filtered-out)')];
+        if (cards.length === 0) return;
+        totalCards += cards.length;
+
+        texto += `${titulo} (${cards.length})\n`;
+        cards.forEach(card => {
+            const title = card.querySelector('.title-card')?.textContent || '';
+            const prio = card.querySelector('.badge')?.dataset.priority || 'low';
+            const emoji = prio === 'high' ? '🔴' : prio === 'medium' ? '🟡' : '🟢';
+            texto += `  ${emoji} ${title}\n`;
+        });
+        texto += '\n';
+    });
+
+    if (totalCards === 0) texto += 'Nenhum card no board ainda.\n';
+    texto += '─'.repeat(36) + '\n';
+    texto += 'Bloqueios: Nenhum';
+
+    return texto;
+}
+
+function abrirStandupModal() {
+    document.getElementById('standup-content').textContent = gerarTextoStandup();
+    document.getElementById('standup-copied').classList.add('hidden');
+    standupModal.classList.remove('hidden');
+}
+
+standupBtn?.addEventListener('click', abrirStandupModal);
+document.getElementById('standup-modal-close')?.addEventListener('click', () => standupModal.classList.add('hidden'));
+standupModal?.addEventListener('click', e => { if (e.target === standupModal) standupModal.classList.add('hidden'); });
+
+document.getElementById('standup-copy-btn')?.addEventListener('click', () => {
+    const texto = document.getElementById('standup-content').textContent;
+    navigator.clipboard.writeText(texto).then(() => {
+        const hint = document.getElementById('standup-copied');
+        hint.classList.remove('hidden');
+        setTimeout(() => hint.classList.add('hidden'), 2000);
+    });
+});
+
+// ============================================
 // MODAL DE DETALHES DO CARD
 // ============================================
 const cardModal = document.getElementById('card-modal');
@@ -700,9 +861,10 @@ cardModal?.addEventListener('click', e => {
 });
 
 document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && cardModal && !cardModal.classList.contains('hidden')) {
-        fecharModalCard();
-    }
+    if (e.key !== 'Escape') return;
+    if (cardModal && !cardModal.classList.contains('hidden')) fecharModalCard();
+    if (githubModal && !githubModal.classList.contains('hidden')) fecharGithubModal();
+    if (standupModal && !standupModal.classList.contains('hidden')) standupModal.classList.add('hidden');
 });
 
 document.getElementById('card-modal-delete')?.addEventListener('click', () => {

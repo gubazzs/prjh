@@ -105,6 +105,7 @@ function renderizar() {
 
         card.innerHTML = `
             <div class="proj-actions">
+                <button class="proj-share" title="Compartilhar"><i class="fa-solid fa-share-nodes"></i></button>
                 <button class="proj-edit" title="Editar"><i class="fa-solid fa-pen"></i></button>
                 <button class="proj-delete" title="Excluir"><i class="fa-solid fa-trash"></i></button>
             </div>
@@ -121,6 +122,11 @@ function renderizar() {
         card.addEventListener('click', (e) => {
             if (e.target.closest('.proj-actions')) return;
             window.location.href = `dashboard.html?project=${proj.id}`;
+        });
+
+        card.querySelector('.proj-share').addEventListener('click', (e) => {
+            e.stopPropagation();
+            abrirShareModal(proj);
         });
 
         card.querySelector('.proj-edit').addEventListener('click', (e) => {
@@ -264,6 +270,105 @@ if (logoutBtn) {
         sessionStorage.removeItem('usuario-tasky');
         window.location.href = 'inicial.html';
     });
+}
+
+// ============================================
+// COMPARTILHAMENTO DE PROJETOS
+// ============================================
+function codificar(obj) {
+    return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
+}
+
+function decodificar(str) {
+    return JSON.parse(decodeURIComponent(escape(atob(str))));
+}
+
+function gerarLink(proj) {
+    const board = JSON.parse(localStorage.getItem(chaveBoard(proj.id))) || [];
+    const payload = { projeto: proj, board };
+    const encoded = codificar(payload);
+    return `${location.href.split('?')[0]}?import=${encoded}`;
+}
+
+function abrirShareModal(proj) {
+    const modal = document.getElementById('share-modal');
+    document.getElementById('share-modal-title').textContent = `Compartilhar "${proj.name}"`;
+
+    const info = document.getElementById('share-project-info');
+    info.innerHTML = `
+        <div class="share-proj-preview" style="--proj-color: ${proj.color}">
+            <div class="share-proj-dot"></div>
+            <div>
+                <strong>${escapar(proj.name)}</strong>
+                <span>${contarTarefas(proj.id)} tarefa${contarTarefas(proj.id) !== 1 ? 's' : ''}</span>
+            </div>
+        </div>
+    `;
+
+    const link = gerarLink(proj);
+    document.getElementById('share-link-input').value = link;
+    document.getElementById('share-copied').classList.add('hidden');
+    modal.classList.remove('hidden');
+}
+
+document.getElementById('share-close').addEventListener('click', () => {
+    document.getElementById('share-modal').classList.add('hidden');
+});
+
+document.getElementById('share-modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('share-modal')) {
+        document.getElementById('share-modal').classList.add('hidden');
+    }
+});
+
+document.getElementById('share-copy-btn').addEventListener('click', () => {
+    const input = document.getElementById('share-link-input');
+    navigator.clipboard.writeText(input.value).then(() => {
+        const hint = document.getElementById('share-copied');
+        hint.classList.remove('hidden');
+        setTimeout(() => hint.classList.add('hidden'), 2500);
+    });
+});
+
+// IMPORTAÇÃO VIA LINK
+const importParam = new URLSearchParams(location.search).get('import');
+
+if (importParam && usuarioLogado) {
+    try {
+        const { projeto, board } = decodificar(importParam);
+        if (!projeto?.name) throw new Error();
+
+        const preview = document.getElementById('import-project-preview');
+        preview.innerHTML = `
+            <div class="share-proj-preview" style="--proj-color: ${projeto.color || '#58a6ff'}">
+                <div class="share-proj-dot"></div>
+                <div>
+                    <strong>${escapar(projeto.name)}</strong>
+                    <span>${(board || []).reduce((t, c) => t + (c.cards?.length || 0), 0)} tarefa${board?.reduce((t,c)=>t+(c.cards?.length||0),0) !== 1 ? 's' : ''} · ${(board||[]).length} coluna${(board||[]).length !== 1 ? 's' : ''}</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('import-share-modal').classList.remove('hidden');
+
+        document.getElementById('import-confirmar').addEventListener('click', () => {
+            const novoId = Date.now().toString();
+            const projetos = lerProjetos();
+            projetos.push({ ...projeto, id: novoId, createdAt: Date.now() });
+            salvarProjetos(projetos);
+            localStorage.setItem(chaveBoard(novoId), JSON.stringify(board || []));
+            history.replaceState(null, '', location.pathname);
+            document.getElementById('import-share-modal').classList.add('hidden');
+            renderizar();
+        });
+
+        document.getElementById('import-ignorar').addEventListener('click', () => {
+            history.replaceState(null, '', location.pathname);
+            document.getElementById('import-share-modal').classList.add('hidden');
+        });
+    } catch {
+        history.replaceState(null, '', location.pathname);
+    }
 }
 
 // ============================================

@@ -1,0 +1,267 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+* { font-family: 'Poppins', sans-serif; margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+    --bg-dark: #0a0f1e;
+    --bg-card: rgba(18, 25, 44, 0.6);
+    --border-glass: rgba(146, 173, 247, 0.2);
+    --text-primary: #e0e0e0;
+    --text-secondary: #9ba6c4;
+    --neon-blue: #58a6ff;
+    --neon-pink: #d573b6;
+    --neon-green: #6ed0bc;
+    --neon-orange: #fea065;
+}
+
+body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0a0f1e 0%, #010258 100%);
+    color: var(--text-primary);
+}
+
+/* HEADER */
+.analytics-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-glass);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.back-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+    background: rgba(146, 173, 247, 0.08);
+    border: 1px solid var(--border-glass);
+    text-decoration: none;
+    font-size: 14px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.back-btn:hover {
+    color: var(--neon-blue);
+    border-color: var(--neon-blue);
+    background: rgba(88, 166, 255, 0.12);
+}
+
+.project-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    padding-left: 12px;
+    border-left: 2px solid var(--proj-color, var(--border-glass));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+}
+
+.analytics-badge {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--neon-blue);
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid rgba(88, 166, 255, 0.3);
+    border-radius: 20px;
+    padding: 5px 14px;
+}
+
+/* MAIN */
+.analytics-main {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.analytics-top h1 {
+    font-size: 26px;
+    font-weight: 700;
+}
+
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 14px;
+    margin-top: 4px;
+}
+
+/* KPI GRID */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.kpi-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: all 0.2s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(146, 173, 247, 0.35);
+}
+
+.kpi-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.kpi-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* CHARTS */
+.charts-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.chart-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-glass);
+    border-radius: 14px;
+    padding: 22px;
+}
+
+.chart-card h2 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.chart-card h2 i { color: var(--text-secondary); font-size: 14px; }
+
+.bar-chart { display: flex; flex-direction: column; gap: 14px; }
+
+.bar-row {
+    display: grid;
+    grid-template-columns: 120px 1fr 30px;
+    align-items: center;
+    gap: 12px;
+}
+
+.bar-label {
+    font-size: 13px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.bar-track {
+    height: 10px;
+    background: rgba(146, 173, 247, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    min-width: 4px;
+}
+
+.bar-value {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: right;
+}
+
+.empty-chart {
+    color: var(--text-secondary);
+    font-size: 14px;
+    text-align: center;
+    padding: 24px 0;
+}
+
+/* OVERDUE */
+.overdue-list { display: flex; flex-direction: column; gap: 10px; }
+
+.overdue-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    background: rgba(248, 113, 113, 0.06);
+    border: 1px solid rgba(248, 113, 113, 0.2);
+    border-radius: 10px;
+}
+
+.overdue-item i { font-size: 16px; flex-shrink: 0; }
+
+.overdue-info { display: flex; flex-direction: column; gap: 2px; }
+
+.overdue-title { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+
+.overdue-meta { font-size: 12px; color: var(--text-secondary); }
+
+/* RESPONSIVE */
+@media (max-width: 720px) {
+    .charts-row { grid-template-columns: 1fr; }
+    .analytics-main { padding: 20px 16px 48px; }
+    .bar-row { grid-template-columns: 90px 1fr 28px; }
+}
+
+@media (max-width: 480px) {
+    .kpi-grid { grid-template-columns: 1fr 1fr; }
+    .analytics-badge { display: none; }
+}

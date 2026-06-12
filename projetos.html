@@ -53,6 +53,51 @@
         </div>
     </main>
 
+    <!-- modal: compartilhar projeto -->
+    <div id="share-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h2 id="share-modal-title">Compartilhar projeto</h2>
+                <button id="share-close" class="modal-close" title="Fechar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div id="share-project-info" class="share-project-info"></div>
+            <p class="share-desc">
+                <i class="fa-solid fa-circle-info"></i>
+                Qualquer pessoa com esse link pode importar uma cópia desse projeto para a conta dela.
+            </p>
+            <div class="share-link-row">
+                <input type="text" id="share-link-input" class="share-link-input" readonly>
+                <button id="share-copy-btn" class="btn-primario">
+                    <i class="fa-regular fa-copy"></i> Copiar
+                </button>
+            </div>
+            <span id="share-copied" class="share-feedback hidden">
+                <i class="fa-solid fa-check"></i> Link copiado!
+            </span>
+        </div>
+    </div>
+
+    <!-- modal: importar projeto via link -->
+    <div id="import-share-modal" class="modal-overlay hidden">
+        <div class="modal-box">
+            <div class="modal-top">
+                <h2>Importar projeto</h2>
+            </div>
+            <p class="share-desc" style="margin-bottom: 16px;">
+                Você recebeu um projeto compartilhado. Ele será adicionado à sua conta como uma cópia independente.
+            </p>
+            <div id="import-project-preview" class="import-preview"></div>
+            <div class="modal-acoes">
+                <button id="import-ignorar" class="btn-secundario">Ignorar</button>
+                <button id="import-confirmar" class="btn-primario">
+                    <i class="fa-solid fa-file-import"></i> Importar projeto
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- modal de criar / editar projeto -->
     <div id="projeto-modal" class="modal-overlay hidden">
         <div class="modal-box">

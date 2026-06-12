@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tasky · Analytics</title>
+    <link rel="shortcut icon" href="imagens/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="src/css/style-analytics.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+</head>
+<body>
+    <header class="analytics-header">
+        <div class="header-left">
+            <a href="#" id="back-btn" class="back-btn" title="Voltar ao board">
+                <i class="fa-solid fa-arrow-left"></i>
+            </a>
+            <div class="logo">Tasky</div>
+            <span id="project-name" class="project-name"></span>
+        </div>
+        <span class="analytics-badge"><i class="fa-solid fa-chart-column"></i> Analytics</span>
+    </header>
+
+    <main class="analytics-main">
+        <div class="analytics-top">
+            <div>
+                <h1>Visão geral</h1>
+                <p id="analytics-subtitle" class="subtitle"></p>
+            </div>
+        </div>
+
+        <div class="kpi-grid" id="kpi-grid"></div>
+
+        <div class="charts-row">
+            <div class="chart-card">
+                <h2><i class="fa-solid fa-table-columns"></i> Cards por coluna</h2>
+                <div id="column-chart" class="bar-chart"></div>
+            </div>
+            <div class="chart-card">
+                <h2><i class="fa-solid fa-flag"></i> Distribuição de prioridade</h2>
+                <div id="priority-chart" class="bar-chart"></div>
+            </div>
+        </div>
+
+        <div class="chart-card" id="overdue-section">
+            <h2><i class="fa-solid fa-triangle-exclamation" style="color:#f87171;"></i> Cards com prazo vencido</h2>
+            <div id="overdue-list"></div>
+        </div>
+    </main>
+
+    <script src="src/javascript/analytics.js"></script>
+</body>
+</html>

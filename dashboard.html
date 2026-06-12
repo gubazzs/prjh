@@ -29,6 +29,16 @@
             <option value="medium">Média</option>
             <option value="low">Baixa</option>
         </select>
+        <div class="toolbar-divider"></div>
+        <button id="standup-btn" class="toolbar-action-btn" title="Gerar standup do board">
+            <i class="fa-solid fa-clipboard-list"></i> Standup
+        </button>
+        <button id="github-btn" class="toolbar-action-btn" title="Importar issues do GitHub">
+            <i class="fa-brands fa-github"></i>
+        </button>
+        <a id="analytics-link" href="#" class="toolbar-action-btn" title="Ver analytics">
+            <i class="fa-solid fa-chart-column"></i>
+        </a>
     </div>
 
     <div class="user-menu">
@@ -110,6 +120,58 @@
             <span>Adicionar coluna</span>
         </button>
     </main>
+
+    <!-- modal: GitHub Issues Import -->
+    <div id="github-modal" class="card-modal-overlay hidden">
+        <div class="card-modal-box github-modal-box">
+            <div class="card-modal-header">
+                <div class="modal-title-row">
+                    <i class="fa-brands fa-github modal-title-icon"></i>
+                    <span>Importar Issues do GitHub</span>
+                </div>
+                <button class="card-modal-close" id="github-modal-close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="card-modal-body">
+                <div class="github-repo-row">
+                    <input type="text" id="github-repo-url" class="github-repo-input" placeholder="github.com/usuario/repositorio">
+                    <button id="github-fetch-btn" class="btn-primario">Buscar</button>
+                </div>
+                <div id="github-issues-list" class="github-issues-list hidden"></div>
+            </div>
+            <div class="card-modal-footer github-footer hidden" id="github-footer">
+                <span id="github-selected-count" class="github-count">0 selecionadas</span>
+                <button id="github-add-btn" class="btn-primario">
+                    <i class="fa-solid fa-plus"></i> Adicionar como cards
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- modal: Standup Generator -->
+    <div id="standup-modal" class="card-modal-overlay hidden">
+        <div class="card-modal-box">
+            <div class="card-modal-header">
+                <div class="modal-title-row">
+                    <i class="fa-solid fa-clipboard-list modal-title-icon" style="color: var(--neon-blue);"></i>
+                    <span>Standup Generator</span>
+                </div>
+                <button class="card-modal-close" id="standup-modal-close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="card-modal-body">
+                <pre id="standup-content" class="standup-content"></pre>
+            </div>
+            <div class="card-modal-footer" style="justify-content: flex-end; gap: 10px;">
+                <span id="standup-copied" class="copied-hint hidden">Copiado!</span>
+                <button id="standup-copy-btn" class="btn-primario">
+                    <i class="fa-regular fa-copy"></i> Copiar
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- modal de detalhes do card -->
     <div id="card-modal" class="card-modal-overlay hidden">
